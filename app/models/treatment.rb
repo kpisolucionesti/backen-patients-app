@@ -1,3 +1,3 @@
 class Treatment < ApplicationRecord
-    # belongs_to :diagnostic
+    belongs_to :diagnostic
 end

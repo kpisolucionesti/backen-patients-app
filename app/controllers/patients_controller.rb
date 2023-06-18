@@ -9,8 +9,6 @@ class PatientsController < ApplicationController
     def create
         patient = Patient.new(patient_params)
         if patient.save
-            diagnostic = patient.diagnostics.create(diagnostic: extra_params[:current_diagnostic],doctor_id: extra_params[:current_doctor])
-            diagnostic.treatments.create(name: extra_params[:treatment])
             render json: ::PatientRepresenter.new(patient),status: :created
         else
             render json: {error: "No se pudo guardar"},status: :unprocessable_entity
@@ -19,10 +17,6 @@ class PatientsController < ApplicationController
 
     def update
         if @patient.update(patient_params)
-            if extra_params[:current_diagnostic] != @patient.current_diagnostic.diagnostic
-                diagnostic = @patient.diagnostics.create(diagnostic: extra_params[:current_diagnostic],doctor_id: extra_params[:current_doctor])
-                diagnostic.treatments.create(name: extra_params[:treatment])
-            end
             render json: ::PatientRepresenter.new(@patient),status: :ok
         else
             render json: {error: "No se pudo guardar"},status: :unprocessable_entity
@@ -31,14 +25,11 @@ class PatientsController < ApplicationController
 
     private
     def patient_params
-        params.permit(:ci, :name, :age, :gender, :status, :medical_exit)
-    end
-
-    def extra_params
-        params.permit(:current_doctor,  :current_diagnostic, :treatment)
+        params.permit(:ci, :name, :age, :gender, :status, :ingress_date, :medical_exit, :current_doctor, :current_diagnostic, :treatment)
     end
 
     def set_patient
         @patient = Patient.find(params[:id])
     end
+
 end

@@ -10,10 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_06_13_235230) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_18_184130) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "diagnostics", force: :cascade do |t|
-    t.integer "patient_id"
-    t.integer "doctor_id"
+    t.bigint "patient_id"
+    t.bigint "doctor_id"
     t.string "diagnostic"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -28,6 +31,25 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_13_235230) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "doctors_patients", id: false, force: :cascade do |t|
+    t.bigint "doctor_id", null: false
+    t.bigint "patient_id", null: false
+    t.index ["doctor_id", "patient_id"], name: "index_doctors_patients_on_doctor_id_and_patient_id"
+    t.index ["patient_id", "doctor_id"], name: "index_doctors_patients_on_patient_id_and_doctor_id"
+  end
+
+  create_table "emergencies", force: :cascade do |t|
+    t.bigint "patient_id"
+    t.bigint "doctor_id"
+    t.string "ingress_date"
+    t.integer "status"
+    t.string "medical_exit"
+    t.string "diagnostic"
+    t.string "treatment"
+    t.index ["doctor_id"], name: "index_emergencies_on_doctor_id"
+    t.index ["patient_id"], name: "index_emergencies_on_patient_id"
+  end
+
   create_table "patients", force: :cascade do |t|
     t.string "ci"
     t.string "name"
@@ -35,9 +57,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_13_235230) do
     t.string "gender"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "status"
     t.string "medical_exit"
     t.string "ingress_date"
+    t.integer "status"
+    t.string "current_diagnostic"
+    t.string "treatment"
+    t.string "current_doctor"
   end
 
   create_table "rooms", force: :cascade do |t|
@@ -50,7 +75,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_13_235230) do
 
   create_table "treatments", force: :cascade do |t|
     t.string "name"
-    t.integer "diagnostic_id"
+    t.bigint "diagnostic_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["diagnostic_id"], name: "index_treatments_on_diagnostic_id"

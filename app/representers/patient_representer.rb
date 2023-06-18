@@ -5,21 +5,10 @@ class PatientRepresenter < Representable::Decorator
     property :name
     property :age
     property :gender
-    property :status
+    property :current_doctor
+    property :current_diagnostic
+    property :treatment
+    property :ingress_date
     property :medical_exit
-    property :current_doctor, exec_context: :decorator
-    property :current_diagnostic, exec_context: :decorator
-    property :treatment, exec_context: :decorator
-
-    def current_doctor
-        represented.current_doctor.name
-    end
-
-    def current_diagnostic
-        represented.current_diagnostic.diagnostic
-    end
-
-    def treatment
-        represented.current_diagnostic.treatments.last.name
-    end
+    property :status
 end
