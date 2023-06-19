@@ -17,6 +17,10 @@ adulto_rooms=[
     'Aislamiento 1',
     'Aislamiento 2',
     'Traumashock',
+    'Sillon 1',
+    'Sillon 2',
+    'Sillon 3',
+    'Sillon 4',
 ]
 
 kids_rooms=[

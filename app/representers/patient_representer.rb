@@ -11,4 +11,6 @@ class PatientRepresenter < Representable::Decorator
     property :ingress_date
     property :medical_exit
     property :status
+    property :observations
+    property :transfer
 end
