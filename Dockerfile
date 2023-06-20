@@ -5,4 +5,5 @@ RUN mkdir -p $RAILS_ROOT
 WORKDIR $RAILS_ROOT
 COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
+COPY . .
 RUN bundle install
