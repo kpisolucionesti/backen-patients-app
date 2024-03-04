@@ -31,13 +31,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_22_204730) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "doctors_patients", id: false, force: :cascade do |t|
-    t.bigint "doctor_id", null: false
-    t.bigint "patient_id", null: false
-    t.index ["doctor_id", "patient_id"], name: "index_doctors_patients_on_doctor_id_and_patient_id"
-    t.index ["patient_id", "doctor_id"], name: "index_doctors_patients_on_patient_id_and_doctor_id"
-  end
-
   create_table "emergencies", force: :cascade do |t|
     t.bigint "patient_id"
     t.bigint "doctor_id"
