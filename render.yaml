@@ -1,7 +1,7 @@
 databases:
   - name: postgres
     databaseName: pacientes_db
-    user: postgres
+    user: pacientes_db
     plan: free
 
 services:
