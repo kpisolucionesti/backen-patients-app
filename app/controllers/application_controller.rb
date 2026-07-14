@@ -16,4 +16,12 @@ class ApplicationController < ActionController::Base
         render json: { status: "error", message: "Authentication required" }, status: :unauthorized
       end
     end
+
+    def authorize!(permission)
+      return unless @current_user
+      return if @current_user.admin?
+      unless @current_user.effective_permissions.include?(permission)
+        render json: { error: "No autorizado" }, status: :forbidden
+      end
+    end
 end

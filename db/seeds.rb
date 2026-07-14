@@ -1,17 +1,51 @@
+EmergencyDoctor.destroy_all
+Emergency.destroy_all
+Note.destroy_all
+Patient.destroy_all
+Room.destroy_all
+Doctor.destroy_all
 User.destroy_all
+Profile.destroy_all
+
+admin_permissions = [
+  'emergencia.view', 'emergencia.create', 'emergencia.edit',
+  'emergencia.triage', 'emergencia.discharge',
+  'historial.view', 'historial.export',
+  'configuraciones.view',
+  'pacientes.view', 'pacientes.edit',
+  'medicos.view', 'medicos.create', 'medicos.edit', 'medicos.suspend',
+  'usuarios.view', 'usuarios.create', 'usuarios.edit',
+  'usuarios.suspend', 'usuarios.manage_permissions', 'usuarios.change_password',
+  'perfiles.view', 'perfiles.create', 'perfiles.edit', 'perfiles.delete',
+  'rooms.view',
+  'notes.view', 'notes.create', 'notes.edit', 'notes.delete',
+  'emergencia.assign_room',
+]
+
+Profile.create!(
+  name: 'Administrador',
+  description: 'Acceso completo a todos los modulos',
+  permissions: admin_permissions
+)
+
+Profile.create!(
+  name: 'User',
+  description: 'Acceso basico solo a visualizar emergencia',
+  permissions: ['emergencia.view']
+)
+
+admin_profile = Profile.find_by(name: 'Administrador')
+
 User.create!(
   email: "admin@emerboard.com",
   password: "123456",
   password_confirmation: "123456",
   name: "Admin",
+  profile: admin_profile,
+  status: 'active',
   confirmed_at: Time.current
 )
 
-Patient.destroy_all
-Emergency.destroy_all
-EmergencyDoctor.destroy_all
-
-Room.destroy_all
 adulto_rooms=[
     'Cubiculo 1',
     'Cubiculo 2',
@@ -35,7 +69,6 @@ kids_rooms=[
     'Traumashock',
 ]
 
-Doctor.destroy_all
 medicos=[
     {
         name: "ALBA AMUNDARAY",

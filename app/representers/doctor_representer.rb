@@ -3,4 +3,5 @@ class DoctorRepresenter < Representable::Decorator
     property :id
     property :name
     property :speciality
+    property :status
 end

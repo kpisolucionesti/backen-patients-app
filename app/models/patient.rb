@@ -1,6 +1,7 @@
 class Patient < ApplicationRecord
   has_many :emergencies, dependent: :destroy
   has_many :notes, dependent: :destroy
+  belongs_to :created_by, class_name: 'User', optional: true
 
   validates :ci, uniqueness: true
 
@@ -8,5 +9,9 @@ class Patient < ApplicationRecord
     return nil unless birthday
     now = Date.current
     now.year - birthday.year - ((now.month > birthday.month || (now.month == birthday.month && now.day >= birthday.day)) ? 0 : 1)
+  end
+
+  def minor?
+    age && age < 18
   end
 end

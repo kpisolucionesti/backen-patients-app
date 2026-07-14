@@ -1,18 +1,23 @@
 class EmergenciesController < ApplicationController
+    before_action :authenticate_user!
     before_action :set_emergency, only: [:update, :destroy, :show]
 
     def index
+        authorize!('emergencia.view')
         emergencies = Emergency.includes(:patient, :doctors).all
         render json: ::EmergencyRepresenter.for_collection.new(emergencies), status: :ok
     end
 
     def show
+        authorize!('emergencia.view')
         render json: ::EmergencyRepresenter.new(@emergency), status: :ok
     end
 
     def create
+        authorize!('emergencia.create')
         ActiveRecord::Base.transaction do
             emergency = Emergency.new(emergency_params)
+            emergency.created_by = @current_user
             emergency.save!
             assign_doctors(emergency)
             render json: ::EmergencyRepresenter.new(emergency), status: :created
@@ -22,6 +27,7 @@ class EmergenciesController < ApplicationController
     end
 
     def update
+        authorize!('emergencia.edit')
         ActiveRecord::Base.transaction do
             @emergency.update!(emergency_params)
             assign_doctors(@emergency) if params[:doctors].present?

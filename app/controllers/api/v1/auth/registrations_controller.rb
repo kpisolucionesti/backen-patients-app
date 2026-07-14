@@ -4,6 +4,9 @@ module Api
       class RegistrationsController < ApplicationController
         def create
           user = User.new(sign_up_params)
+          default_profile = Profile.find_by(name: 'User')
+          user.profile = default_profile if default_profile
+          user.skip_confirmation!
 
           if user.save
             render json: {
@@ -32,6 +35,9 @@ module Api
             id: user.id,
             email: user.email,
             name: user.name,
+            profile_id: user.profile_id,
+            permissions: user.effective_permissions,
+            is_admin: user.admin?,
             confirmed: user.confirmed?
           }
         end

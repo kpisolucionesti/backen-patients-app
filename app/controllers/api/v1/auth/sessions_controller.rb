@@ -7,6 +7,9 @@ module Api
 
           if user && user.valid_password?(params[:password])
             if user.confirmed?
+              if user.status == 'suspended'
+                return render json: { status: "error", message: "Usuario suspendido" }, status: :unauthorized
+              end
               user.ensure_authentication_token
               user.save!
               render json: {
@@ -52,6 +55,9 @@ module Api
             id: user.id,
             email: user.email,
             name: user.name,
+            profile_id: user.profile_id,
+            permissions: user.effective_permissions,
+            is_admin: user.admin?,
             confirmed: user.confirmed?
           }
         end
