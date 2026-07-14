@@ -7,6 +7,10 @@ User.create!(
   confirmed_at: Time.current
 )
 
+Patient.destroy_all
+Emergency.destroy_all
+EmergencyDoctor.destroy_all
+
 Room.destroy_all
 adulto_rooms=[
     'Cubiculo 1',

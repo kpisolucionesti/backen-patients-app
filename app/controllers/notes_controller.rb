@@ -23,6 +23,11 @@ class NotesController < ApplicationController
         end    
     end
 
+    def destroy
+        @note.destroy
+        render json: {message: "Eliminado"}, status: :ok
+    end
+
     private
     def note_params
         params.permit(:note, :patient_id)

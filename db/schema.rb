@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_06_23_000000) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_25_000005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -32,15 +32,27 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_23_000000) do
   end
 
   create_table "emergencies", force: :cascade do |t|
-    t.bigint "patient_id"
-    t.bigint "doctor_id"
+    t.bigint "patient_id", null: false
     t.string "ingress_date"
-    t.integer "status"
+    t.integer "status", default: 1
     t.string "medical_exit"
     t.string "diagnostic"
     t.string "treatment"
-    t.index ["doctor_id"], name: "index_emergencies_on_doctor_id"
+    t.string "observations"
+    t.string "transfer"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["patient_id"], name: "index_emergencies_on_patient_id"
+  end
+
+  create_table "emergency_doctors", force: :cascade do |t|
+    t.bigint "emergency_id", null: false
+    t.bigint "doctor_id", null: false
+    t.boolean "primary", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["doctor_id"], name: "index_emergency_doctors_on_doctor_id"
+    t.index ["emergency_id"], name: "index_emergency_doctors_on_emergency_id"
   end
 
   create_table "notes", force: :cascade do |t|
@@ -53,18 +65,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_23_000000) do
   create_table "patients", force: :cascade do |t|
     t.string "ci"
     t.string "name"
-    t.integer "age"
     t.string "gender"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "medical_exit"
-    t.string "ingress_date"
-    t.integer "status"
-    t.string "current_diagnostic"
-    t.string "treatment"
-    t.string "current_doctor"
-    t.string "observations"
-    t.string "transfer"
+    t.date "birthday"
+    t.string "lastname"
+    t.index ["ci"], name: "index_patients_on_ci", unique: true
   end
 
   create_table "rooms", force: :cascade do |t|
@@ -103,4 +109,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_23_000000) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "emergencies", "patients"
+  add_foreign_key "emergency_doctors", "doctors"
+  add_foreign_key "emergency_doctors", "emergencies"
 end

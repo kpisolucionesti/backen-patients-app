@@ -1,8 +1,13 @@
 Rails.application.routes.draw do
-  resources :patients
+  resources :patients do
+    collection do
+      get :find_by_ci
+    end
+  end
   resources :doctors
   resources :rooms
   resources :notes
+  resources :emergencies
 
   namespace :api do
     namespace :v1 do

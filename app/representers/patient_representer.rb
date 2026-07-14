@@ -3,14 +3,8 @@ class PatientRepresenter < Representable::Decorator
     property :id
     property :ci
     property :name
+    property :lastname
     property :age
+    property :birthday
     property :gender
-    property :current_doctor
-    property :current_diagnostic
-    property :treatment
-    property :ingress_date
-    property :medical_exit
-    property :status
-    property :observations
-    property :transfer
 end
