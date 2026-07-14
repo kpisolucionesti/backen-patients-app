@@ -3,9 +3,14 @@ Rails.application.routes.draw do
   resources :doctors
   resources :rooms
   resources :notes
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
-  # Defines the root path route ("/")
-  # root "welcome#index"
-
+  namespace :api do
+    namespace :v1 do
+      namespace :auth do
+        post "sign_up",  to: "registrations#create"
+        post "sign_in",  to: "sessions#create"
+        delete "sign_out", to: "sessions#destroy"
+      end
+    end
+  end
 end
