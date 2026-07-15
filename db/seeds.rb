@@ -30,8 +30,8 @@ Profile.create!(
 
 Profile.create!(
   name: 'User',
-  description: 'Acceso basico solo a visualizar emergencia',
-  permissions: ['emergencia.view']
+  description: 'Acceso basico a visualizar emergencias e historial',
+  permissions: ['emergencia.view', 'historial.view']
 )
 
 admin_profile = Profile.find_by(name: 'Administrador')

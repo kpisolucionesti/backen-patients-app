@@ -16,10 +16,17 @@ class UsersController < ApplicationController
     def create
         authorize!('usuarios.create')
         user = User.new(user_params)
+        user.profile ||= Profile.find_by(name: 'User')
         user.password = params[:password]
         user.password_confirmation = params[:password_confirmation]
         user.skip_confirmation!
         if user.save
+            begin
+                raw_token = user.set_reset_password_token
+                UserMailer.welcome_email(user, raw_token).deliver_now
+            rescue => e
+                Rails.logger.error("Error enviando correo de bienvenida: #{e.message}")
+            end
             render json: user_response(user), status: :created
         else
             render json: { errors: user.errors.full_messages }, status: :unprocessable_entity

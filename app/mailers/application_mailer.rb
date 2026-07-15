@@ -1,4 +1,10 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "from@example.com"
   layout "mailer"
+
+  private
+
+  def apply_email_settings
+    settings = EmailSetting.first
+    settings&.apply!
+  end
 end

@@ -26,7 +26,7 @@ class EmailSettingsController < ApplicationController
 
     def test
         settings = EmailSetting.new(test_params)
-        result = settings.test_connection
+        result = settings.send_test_email
         if result[:success]
             render json: { message: result[:message] }, status: :ok
         else
@@ -47,6 +47,6 @@ class EmailSettingsController < ApplicationController
     end
 
     def test_params
-        params.permit(:smtp_address, :smtp_port, :smtp_username, :smtp_password, :authentication, :enable_starttls_auto)
+        params.permit(:smtp_address, :smtp_port, :smtp_username, :smtp_password, :sender_email, :authentication, :enable_starttls_auto)
     end
 end

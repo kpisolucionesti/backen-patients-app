@@ -9,6 +9,12 @@ module Api
           user.skip_confirmation!
 
           if user.save
+            begin
+              raw_token = user.set_reset_password_token
+              UserMailer.welcome_email(user, raw_token).deliver_now
+            rescue => e
+              Rails.logger.error("Error enviando correo de bienvenida: #{e.message}")
+            end
             render json: {
               status: "success",
               message: "User created successfully",

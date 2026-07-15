@@ -27,8 +27,8 @@ class ProfilesController < ApplicationController
 
     def destroy
         authorize!('perfiles.delete')
-        if @profile.admin?
-            return render json: { error: "No se puede eliminar el perfil Administrador" }, status: :forbidden
+        if @profile.protected?
+            return render json: { error: "No se puede eliminar el perfil #{@profile.name}" }, status: :forbidden
         end
         if @profile.users.any?
             return render json: { error: "No se puede eliminar un perfil con usuarios asignados" }, status: :unprocessable_entity

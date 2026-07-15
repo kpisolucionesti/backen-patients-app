@@ -1,6 +1,12 @@
 class ApplicationController < ActionController::Base
     skip_before_action :verify_authenticity_token
 
+    class NotAuthorized < StandardError; end
+
+    rescue_from NotAuthorized do |_exception|
+      render json: { error: "No autorizado" }, status: :forbidden
+    end
+
     private
 
     def authenticate_with_token
@@ -21,7 +27,7 @@ class ApplicationController < ActionController::Base
       return unless @current_user
       return if @current_user.admin?
       unless @current_user.effective_permissions.include?(permission)
-        render json: { error: "No autorizado" }, status: :forbidden
+        raise NotAuthorized
       end
     end
 end

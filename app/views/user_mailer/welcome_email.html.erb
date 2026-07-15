@@ -1,0 +1,13 @@
+<p>Hola <%= @user.name %>,</p>
+
+<p>Tu cuenta en Emerboard ha sido creada exitosamente.</p>
+
+<p>Para acceder al sistema, primero debes establecer tu contrasena haciendo clic en el siguiente enlace:</p>
+
+<p><%= link_to "Establecer contrasena", "#{ENV['FRONTEND_URL'] || 'http://localhost:3000'}/reset-password?reset_token=#{@token}" %></p>
+
+<p>Este enlace expirara en 6 horas.</p>
+
+<p>Si no realizaste esta solicitud, ignora este mensaje.</p>
+
+<p>Saludos,<br>Equipo Emerboard</p>
