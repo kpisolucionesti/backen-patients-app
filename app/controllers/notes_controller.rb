@@ -15,6 +15,8 @@ class NotesController < ApplicationController
         note = Note.new(note_params)
         note.created_by = @current_user
         if note.save
+            patient_name = note.patient ? "#{note.patient.name} #{note.patient.lastname}" : "ID #{note.patient_id}"
+            UserActivityLog.create!(user: @current_user, action: 'create_note', description: "Creó nota para paciente #{patient_name}")
             render json: ::NoteRepresenter.new(note),status: :created
         else
             render json: {error: "No se pudo guardar"},status: :unprocessable_entity
@@ -24,6 +26,8 @@ class NotesController < ApplicationController
     def update
         authorize!('notes.edit')
         if @note.update(note_params)
+            patient_name = @note.patient ? "#{@note.patient.name} #{@note.patient.lastname}" : "ID #{@note.patient_id}"
+            UserActivityLog.create!(user: @current_user, action: 'edit_note', description: "Editó nota para paciente #{patient_name}")
             render json: ::NoteRepresenter.new(@note),status: :ok
         else
             render json: {error: "No se pudo guardar"},status: :unprocessable_entity
@@ -32,6 +36,8 @@ class NotesController < ApplicationController
 
     def destroy
         authorize!('notes.delete')
+        patient_name = @note.patient ? "#{@note.patient.name} #{@note.patient.lastname}" : "ID #{@note.patient_id}"
+        UserActivityLog.create!(user: @current_user, action: 'delete_note', description: "Eliminó nota para paciente #{patient_name}")
         @note.destroy
         render json: {message: "Eliminado"}, status: :ok
     end

@@ -6,3 +6,6 @@ WORKDIR $RAILS_ROOT
 COPY Gemfile Gemfile
 COPY . .
 RUN bundle install
+COPY docker-entrypoint.sh /usr/src/app/docker-entrypoint.sh
+RUN chmod +x /usr/src/app/docker-entrypoint.sh
+ENTRYPOINT ["./docker-entrypoint.sh"]

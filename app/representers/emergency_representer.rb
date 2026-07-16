@@ -11,6 +11,8 @@ class EmergencyRepresenter < Representable::Decorator
     property :transfer
     property :created_at
     property :egress_at
+    property :classification
+    property :cause_of_death
 
     property :created_by do
         property :name
@@ -38,4 +40,6 @@ class EmergencyRepresenter < Representable::Decorator
     end
 
     collection :medical_plans, decorator: MedicalPlanRepresenter
+
+    collection :vital_signs, decorator: VitalSignRepresenter
 end

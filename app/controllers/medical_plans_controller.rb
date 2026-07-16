@@ -14,6 +14,8 @@ class MedicalPlansController < ApplicationController
     plan = @emergency.medical_plans.new(medical_plan_params)
     plan.created_by = @current_user
     if plan.save
+      patient = @emergency.patient
+      UserActivityLog.create!(user: @current_user, action: 'create_medical_plan', description: "Creó plan médico '#{plan.indication_type}' para emergencia #{@emergency.id} del paciente #{patient.name} #{patient.lastname} (CI: #{patient.ci})")
       render json: ::MedicalPlanRepresenter.new(plan), status: :created
     else
       render json: { error: plan.errors.full_messages.join(', ') }, status: :unprocessable_entity
@@ -23,6 +25,8 @@ class MedicalPlansController < ApplicationController
   def update
     authorize!('emergencia.edit')
     if @medical_plan.update(medical_plan_params)
+      patient = @emergency.patient
+      UserActivityLog.create!(user: @current_user, action: 'edit_medical_plan', description: "Editó plan médico '#{@medical_plan.indication_type}' de emergencia #{@emergency.id} del paciente #{patient.name} #{patient.lastname} (CI: #{patient.ci})")
       render json: ::MedicalPlanRepresenter.new(@medical_plan), status: :ok
     else
       render json: { error: @medical_plan.errors.full_messages.join(', ') }, status: :unprocessable_entity
@@ -31,6 +35,8 @@ class MedicalPlansController < ApplicationController
 
   def destroy
     authorize!('emergencia.edit')
+    patient = @emergency.patient
+    UserActivityLog.create!(user: @current_user, action: 'delete_medical_plan', description: "Eliminó plan médico '#{@medical_plan.indication_type}' de emergencia #{@emergency.id} del paciente #{patient.name} #{patient.lastname} (CI: #{patient.ci})")
     @medical_plan.destroy!
     head :no_content
   end

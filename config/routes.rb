@@ -5,12 +5,19 @@ Rails.application.routes.draw do
     collection do
       get :find_by_ci
     end
+    member do
+      get :stats
+    end
+    resources :allergies, controller: 'patient_allergies', only: [:index, :create, :update, :destroy]
+    resources :antecedents, controller: 'patient_antecedents', only: [:index, :create, :update, :destroy]
   end
   resources :doctors
   resources :rooms
   resources :notes
   resources :emergencies do
     resources :medical_plans, only: [:index, :create, :update, :destroy]
+    resources :vital_signs, only: [:index, :create]
+    resources :interconsultations, only: [:index, :create, :update, :destroy]
   end
   resources :profiles do
     member do
@@ -22,6 +29,7 @@ Rails.application.routes.draw do
       put :change_password
       put :update_permissions
       get :emergencies
+      get :activity_logs, to: 'user_activity_logs#index'
     end
     collection do
       get :profiles
@@ -45,6 +53,8 @@ Rails.application.routes.draw do
   resource :email_settings, only: [:show, :update] do
     post :test
   end
+
+  get 'dashboard/stats', to: 'dashboard#stats'
 
   namespace :api do
     namespace :v1 do

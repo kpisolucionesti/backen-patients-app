@@ -8,6 +8,8 @@ class TvScreen < ApplicationRecord
 
   validates :name, presence: true, uniqueness: true
   validates :location, presence: true
+  validates :route, presence: true, uniqueness: true,
+            format: { with: /\A[a-z0-9-]+\z/, message: 'solo minúsculas, números y guiones' }
 
   def authenticate_pin(pin)
     BCrypt::Password.new(pin_digest) == pin

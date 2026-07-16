@@ -79,7 +79,7 @@ class TvScreensController < ApplicationController
 
   def list_active
     screens = TvScreen.where(is_active: true)
-    render json: screens.map { |s| { id: s.id, name: s.name, location: s.location, is_active: s.is_active } }, status: :ok
+    render json: screens.map { |s| { id: s.id, name: s.name, location: s.location, is_active: s.is_active, route: s.route } }, status: :ok
   end
 
   def auth
@@ -117,7 +117,7 @@ class TvScreensController < ApplicationController
   private
 
   def tv_screen_params
-    params.permit(:name, :location, :is_active)
+    params.permit(:name, :location, :is_active, :route)
   end
 
   def set_tv_screen

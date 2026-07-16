@@ -9,4 +9,9 @@ class PatientRepresenter < Representable::Decorator
     property :gender
     property :representante
     property :representante_ci
+    property :last_visit_date
+    property :disabled
+
+    collection :allergies, decorator: PatientAllergyRepresenter
+    collection :antecedents, decorator: PatientAntecedentRepresenter
 end
