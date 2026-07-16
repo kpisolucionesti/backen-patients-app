@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_06_000000) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_11_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -36,7 +36,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_000000) do
 
   create_table "emergencies", force: :cascade do |t|
     t.bigint "patient_id", null: false
-    t.string "ingress_date"
+    t.date "ingress_date"
     t.integer "status", default: 1
     t.string "medical_exit"
     t.string "diagnostic"
@@ -46,8 +46,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_000000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "created_by_id"
+    t.datetime "egress_at"
     t.index ["created_by_id"], name: "index_emergencies_on_created_by_id"
+    t.index ["ingress_date"], name: "index_emergencies_on_ingress_date"
+    t.index ["patient_id", "status"], name: "index_emergencies_on_patient_id_and_status"
     t.index ["patient_id"], name: "index_emergencies_on_patient_id"
+    t.index ["status"], name: "index_emergencies_on_status"
   end
 
   create_table "emergency_doctors", force: :cascade do |t|
@@ -58,6 +62,23 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_000000) do
     t.datetime "updated_at", null: false
     t.index ["doctor_id"], name: "index_emergency_doctors_on_doctor_id"
     t.index ["emergency_id"], name: "index_emergency_doctors_on_emergency_id"
+  end
+
+  create_table "medical_plans", force: :cascade do |t|
+    t.bigint "emergency_id", null: false
+    t.bigint "doctor_id"
+    t.text "description", null: false
+    t.string "indication_type", null: false
+    t.string "status", default: "active"
+    t.datetime "completed_at"
+    t.bigint "created_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_medical_plans_on_created_by_id"
+    t.index ["doctor_id"], name: "index_medical_plans_on_doctor_id"
+    t.index ["emergency_id"], name: "index_medical_plans_on_emergency_id"
+    t.index ["indication_type"], name: "index_medical_plans_on_indication_type"
+    t.index ["status"], name: "index_medical_plans_on_status"
   end
 
   create_table "notes", force: :cascade do |t|
@@ -82,6 +103,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_000000) do
     t.bigint "created_by_id"
     t.index ["ci"], name: "index_patients_on_ci", unique: true
     t.index ["created_by_id"], name: "index_patients_on_created_by_id"
+    t.index ["lastname"], name: "index_patients_on_lastname"
+    t.index ["name"], name: "index_patients_on_name"
   end
 
   create_table "profiles", force: :cascade do |t|
@@ -118,17 +141,23 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_000000) do
     t.string "status", default: "active"
     t.bigint "profile_id"
     t.jsonb "permissions", default: []
+    t.string "username", null: false
+    t.string "lastname"
     t.index ["authentication_token"], name: "index_users_on_authentication_token", unique: true
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["profile_id"], name: "index_users_on_profile_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["username"], name: "index_users_on_username", unique: true
   end
 
   add_foreign_key "emergencies", "patients"
   add_foreign_key "emergencies", "users", column: "created_by_id"
   add_foreign_key "emergency_doctors", "doctors"
   add_foreign_key "emergency_doctors", "emergencies"
+  add_foreign_key "medical_plans", "doctors"
+  add_foreign_key "medical_plans", "emergencies"
+  add_foreign_key "medical_plans", "users", column: "created_by_id"
   add_foreign_key "notes", "users", column: "created_by_id"
   add_foreign_key "patients", "users", column: "created_by_id"
   add_foreign_key "users", "profiles"

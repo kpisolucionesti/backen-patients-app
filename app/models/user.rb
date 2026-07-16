@@ -1,9 +1,13 @@
 class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :confirmable
+         :confirmable,
+         authentication_keys: [:username]
 
   belongs_to :profile, optional: true
+  has_many :emergencies, foreign_key: 'created_by_id'
+
+  validates :username, presence: true, uniqueness: { case_sensitive: false }
 
   before_save :ensure_authentication_token
 
@@ -46,7 +50,7 @@ class User < ApplicationRecord
   end
 
   def protected?
-    admin? || email == 'admin@emerboard.com'
+    admin? || username == 'admin'
   end
 
   private

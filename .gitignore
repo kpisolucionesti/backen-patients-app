@@ -36,4 +36,5 @@
 
 # /config/credentials/production.key
 
-Dockerfile
+# Ignore database dumps
+patient_db-*.sql

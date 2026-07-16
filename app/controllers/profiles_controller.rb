@@ -41,7 +41,7 @@ class ProfilesController < ApplicationController
         authorize!('perfiles.view')
         profile = Profile.find(params[:id])
         users = profile.users
-        render json: users.map { |u| { id: u.id, name: u.name, email: u.email, status: u.status } }, status: :ok
+        render json: users.map { |u| { id: u.id, username: u.username, name: u.name, email: u.email, status: u.status } }, status: :ok
     end
 
     private

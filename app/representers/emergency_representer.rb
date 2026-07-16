@@ -9,6 +9,13 @@ class EmergencyRepresenter < Representable::Decorator
     property :treatment
     property :observations
     property :transfer
+    property :created_at
+    property :egress_at
+
+    property :created_by do
+        property :name
+        property :email
+    end
 
     property :patient, decorator: PatientRepresenter
 
@@ -29,4 +36,6 @@ class EmergencyRepresenter < Representable::Decorator
         property :name
         property :speciality
     end
+
+    collection :medical_plans, decorator: MedicalPlanRepresenter
 end

@@ -1,0 +1,96 @@
+groups:
+  - section: Emergencia
+    color: '#e3f2fd'
+    permissions:
+      - key: emergencia.view
+        label: Ver
+      - key: emergencia.create
+        label: Crear
+      - key: emergencia.edit
+        label: Editar
+      - key: emergencia.triage
+        label: Asignar Triage
+      - key: emergencia.discharge
+        label: Dar de Alta
+      - key: emergencia.assign_room
+        label: Asignar Sala
+
+  - section: Historial
+    color: '#fff3e0'
+    permissions:
+      - key: historial.view
+        label: Ver
+      - key: historial.export
+        label: Exportar
+
+  - section: Configuraciones
+    color: '#e8f5e9'
+    permissions:
+      - key: configuraciones.view
+        label: Ver
+
+  - section: Pacientes
+    color: '#fce4ec'
+    permissions:
+      - key: pacientes.view
+        label: Ver
+      - key: pacientes.edit
+        label: Editar
+
+  - section: Médicos
+    color: '#f3e5f5'
+    permissions:
+      - key: medicos.view
+        label: Ver
+      - key: medicos.create
+        label: Crear
+      - key: medicos.edit
+        label: Editar
+      - key: medicos.suspend
+        label: Suspender
+
+  - section: Usuarios
+    color: '#e0f2f1'
+    permissions:
+      - key: usuarios.view
+        label: Ver
+      - key: usuarios.create
+        label: Crear
+      - key: usuarios.edit
+        label: Editar
+      - key: usuarios.suspend
+        label: Suspender
+      - key: usuarios.manage_permissions
+        label: Gestionar Permisos
+      - key: usuarios.change_password
+        label: Cambiar Contraseña
+
+  - section: Perfiles
+    color: '#fff8e1'
+    permissions:
+      - key: perfiles.view
+        label: Ver
+      - key: perfiles.create
+        label: Crear
+      - key: perfiles.edit
+        label: Editar
+      - key: perfiles.delete
+        label: Eliminar
+
+  - section: Salas
+    color: '#f5f5f5'
+    permissions:
+      - key: rooms.view
+        label: Ver
+
+  - section: Notas
+    color: '#e8eaf6'
+    permissions:
+      - key: notes.view
+        label: Ver
+      - key: notes.create
+        label: Crear
+      - key: notes.edit
+        label: Editar
+      - key: notes.delete
+        label: Eliminar

@@ -9,7 +9,9 @@ Rails.application.routes.draw do
   resources :doctors
   resources :rooms
   resources :notes
-  resources :emergencies
+  resources :emergencies do
+    resources :medical_plans, only: [:index, :create, :update, :destroy]
+  end
   resources :profiles do
     member do
       get :users
@@ -19,11 +21,14 @@ Rails.application.routes.draw do
     member do
       put :change_password
       put :update_permissions
+      get :emergencies
     end
     collection do
       get :profiles
     end
   end
+
+  resources :permissions, only: [:index]
 
   resource :email_settings, only: [:show, :update] do
     post :test

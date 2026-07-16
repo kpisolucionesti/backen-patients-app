@@ -4,8 +4,9 @@ Devise.setup do |config|
 
   require "devise/orm/active_record"
 
-  config.case_insensitive_keys = [:email]
-  config.strip_whitespace_keys = [:email]
+  config.authentication_keys = [:username]
+  config.case_insensitive_keys = [:email, :username]
+  config.strip_whitespace_keys = [:email, :username]
   config.skip_session_storage = [:http_auth]
   config.stretches = Rails.env.test? ? 1 : 12
   config.reconfirmable = true

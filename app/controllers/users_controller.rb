@@ -84,14 +84,21 @@ class UsersController < ApplicationController
         render json: profiles.map { |p| { id: p.id, name: p.name, description: p.description, permissions: p.permissions } }, status: :ok
     end
 
+    def emergencies
+        authorize!('usuarios.view')
+        user = User.find(params[:id])
+        user_emergencies = user.emergencies.includes(:patient, :doctors)
+        render json: ::EmergencyRepresenter.for_collection.new(user_emergencies), status: :ok
+    end
+
     private
 
     def user_params
-        params.permit(:name, :email, :password, :password_confirmation, :status, :profile_id)
+        params.permit(:username, :name, :lastname, :email, :password, :password_confirmation, :status, :profile_id)
     end
 
     def update_params
-        params.permit(:name, :email, :status, :profile_id)
+        params.permit(:username, :name, :lastname, :email, :status, :profile_id)
     end
 
     def set_user
@@ -101,8 +108,10 @@ class UsersController < ApplicationController
     def user_response(user)
         {
             id: user.id,
+            username: user.username,
             email: user.email,
             name: user.name,
+            lastname: user.lastname,
             status: user.status,
             profile_id: user.profile_id,
             profile_name: user.profile&.name,

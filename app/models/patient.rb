@@ -5,6 +5,8 @@ class Patient < ApplicationRecord
 
   validates :ci, uniqueness: true
 
+  before_save :normalize_ci
+
   def age
     return nil unless birthday
     now = Date.current
@@ -13,5 +15,13 @@ class Patient < ApplicationRecord
 
   def minor?
     age && age < 18
+  end
+
+  private
+
+  def normalize_ci
+    return unless ci_changed? || representante_ci_changed?
+    self.ci = ci&.gsub(/\D/, '')
+    self.representante_ci = representante_ci&.gsub(/\D/, '')
   end
 end

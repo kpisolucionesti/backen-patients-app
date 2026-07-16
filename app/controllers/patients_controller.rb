@@ -5,6 +5,12 @@ class PatientsController < ApplicationController
     def index
         authorize!('pacientes.view')
         patients = Patient.all
+
+        if params[:q].present?
+            q = "%#{params[:q]}%"
+            patients = patients.where("name ILIKE ? OR lastname ILIKE ? OR ci ILIKE ?", q, q, q)
+        end
+
         render json: ::PatientRepresenter.for_collection.new(patients), status: :ok
     end
 
@@ -26,7 +32,8 @@ class PatientsController < ApplicationController
 
     def find_by_ci
         authorize!('pacientes.view')
-        patient = Patient.find_by(ci: params[:ci])
+        clean_ci = params[:ci]&.gsub(/\D/, '')
+        patient = Patient.find_by(ci: clean_ci)
         if patient
             render json: ::PatientRepresenter.new(patient), status: :ok
         else

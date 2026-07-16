@@ -38,6 +38,7 @@ admin_profile = Profile.find_by(name: 'Administrador')
 
 User.create!(
   email: "admin@emerboard.com",
+  username: "admin",
   password: "123456",
   password_confirmation: "123456",
   name: "Admin",

@@ -33,14 +33,16 @@ module Api
         private
 
         def sign_up_params
-          params.require(:user).permit(:email, :password, :password_confirmation, :name)
+          params.require(:user).permit(:username, :name, :lastname, :email, :password, :password_confirmation, :profile_id)
         end
 
         def user_response(user)
           {
             id: user.id,
+            username: user.username,
             email: user.email,
             name: user.name,
+            lastname: user.lastname,
             profile_id: user.profile_id,
             permissions: user.effective_permissions,
             is_admin: user.admin?,

@@ -3,7 +3,7 @@ module Api
     module Auth
       class SessionsController < ApplicationController
         def create
-          user = User.find_for_database_authentication(email: params[:email])
+          user = User.find_for_database_authentication(username: params[:username])
 
           if user && user.valid_password?(params[:password])
             if user.confirmed?
@@ -21,13 +21,13 @@ module Api
             else
               render json: {
                 status: "error",
-                message: "You must confirm your email before signing in"
+                message: "Debe confirmar su correo antes de iniciar sesión"
               }, status: :unauthorized
             end
           else
             render json: {
               status: "error",
-              message: "Invalid email or password"
+              message: "Usuario o contraseña inválidos"
             }, status: :unauthorized
           end
         end
@@ -53,8 +53,10 @@ module Api
         def user_response(user)
           {
             id: user.id,
+            username: user.username,
             email: user.email,
             name: user.name,
+            lastname: user.lastname,
             profile_id: user.profile_id,
             permissions: user.effective_permissions,
             is_admin: user.admin?,

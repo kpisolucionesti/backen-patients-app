@@ -22,7 +22,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: <%= ENV['DB_NAME'] %>
+  database: <%= ENV['DB_NAME'] %>_test
 
 production:
   <<: *default
