@@ -3,4 +3,6 @@ class NoteRepresenter < Representable::Decorator
     property :id
     property :note
     property :patient_id
+    property :emergency_id
+    property :created_at
 end

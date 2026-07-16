@@ -1,5 +1,5 @@
 class EmergenciesController < ApplicationController
-    before_action :authenticate_user!
+    before_action :authenticate_tv_or_user!
     before_action :set_emergency, only: [:update, :destroy, :show]
 
     def index

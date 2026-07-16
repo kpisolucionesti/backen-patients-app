@@ -5,6 +5,8 @@ class NotesController < ApplicationController
     def index
         authorize!('notes.view')
         note = Note.all
+        note = note.where(patient_id: params[:patient_id]) if params[:patient_id].present?
+        note = note.where(emergency_id: params[:emergency_id]) if params[:emergency_id].present?
         render json: ::NoteRepresenter.for_collection.new(note),status: :ok
     end
 
@@ -25,7 +27,7 @@ class NotesController < ApplicationController
             render json: ::NoteRepresenter.new(@note),status: :ok
         else
             render json: {error: "No se pudo guardar"},status: :unprocessable_entity
-        end    
+        end
     end
 
     def destroy
@@ -36,10 +38,10 @@ class NotesController < ApplicationController
 
     private
     def note_params
-        params.permit(:note, :patient_id)
+        params.permit(:note, :patient_id, :emergency_id)
     end
 
     def set_note
         @note = Note.find(params[:id])
-    end 
+    end
 end

@@ -38,3 +38,4 @@
 
 # Ignore database dumps
 patient_db-*.sql
+*.sql:Zone.Identifier

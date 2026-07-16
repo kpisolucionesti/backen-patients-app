@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_11_000001) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_13_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -87,7 +87,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_11_000001) do
     t.string "note"
     t.integer "patient_id"
     t.bigint "created_by_id"
+    t.bigint "emergency_id"
     t.index ["created_by_id"], name: "index_notes_on_created_by_id"
+    t.index ["emergency_id"], name: "index_notes_on_emergency_id"
   end
 
   create_table "patients", force: :cascade do |t|
@@ -124,6 +126,38 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_11_000001) do
     t.integer "patient_id"
   end
 
+  create_table "tv_screen_events", force: :cascade do |t|
+    t.bigint "tv_screen_id", null: false
+    t.string "event_type", null: false
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tv_screen_id"], name: "index_tv_screen_events_on_tv_screen_id"
+  end
+
+  create_table "tv_screen_sessions", force: :cascade do |t|
+    t.bigint "tv_screen_id", null: false
+    t.string "auth_token", null: false
+    t.string "ip_address"
+    t.datetime "last_seen_at"
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["auth_token"], name: "index_tv_screen_sessions_on_auth_token", unique: true
+    t.index ["tv_screen_id"], name: "index_tv_screen_sessions_on_tv_screen_id"
+  end
+
+  create_table "tv_screens", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "location", null: false
+    t.string "pin_digest", null: false
+    t.string "public_id", null: false
+    t.boolean "is_active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["public_id"], name: "index_tv_screens_on_public_id", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -158,7 +192,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_11_000001) do
   add_foreign_key "medical_plans", "doctors"
   add_foreign_key "medical_plans", "emergencies"
   add_foreign_key "medical_plans", "users", column: "created_by_id"
+  add_foreign_key "notes", "emergencies"
   add_foreign_key "notes", "users", column: "created_by_id"
   add_foreign_key "patients", "users", column: "created_by_id"
+  add_foreign_key "tv_screen_events", "tv_screens"
+  add_foreign_key "tv_screen_sessions", "tv_screens"
   add_foreign_key "users", "profiles"
 end

@@ -28,6 +28,18 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :tv_screens do
+    collection do
+      post :auth
+      get :list_active
+    end
+    member do
+      post :regenerate_pin
+      post :revoke_sessions
+    end
+    resources :events, only: [:index], controller: 'tv_screen_events'
+  end
+
   resources :permissions, only: [:index]
 
   resource :email_settings, only: [:show, :update] do
