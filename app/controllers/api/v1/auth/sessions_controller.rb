@@ -2,6 +2,8 @@ module Api
   module V1
     module Auth
       class SessionsController < ApplicationController
+        before_action :authenticate_user!, only: [:keep_alive]
+
         def create
           user = User.find_for_database_authentication(username: params[:username])
 
@@ -11,6 +13,7 @@ module Api
                 return render json: { status: "error", message: "Usuario suspendido" }, status: :unauthorized
               end
               user.ensure_authentication_token
+              user.last_activity_at = Time.current
               user.save!
               render json: {
                 status: "success",
@@ -46,6 +49,10 @@ module Api
               message: "Invalid token"
             }, status: :unauthorized
           end
+        end
+
+        def keep_alive
+          render json: { status: "success", message: "Session active" }, status: :ok
         end
 
         private

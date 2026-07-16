@@ -54,6 +54,7 @@ Rails.application.routes.draw do
         delete "sign_out", to: "sessions#destroy"
         post "forgot_password", to: "passwords#create"
         put "reset_password",   to: "passwords#update"
+        post "keep_alive", to: "sessions#keep_alive"
       end
     end
   end

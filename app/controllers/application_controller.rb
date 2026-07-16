@@ -13,7 +13,17 @@ class ApplicationController < ActionController::Base
       token = request.headers["Authorization"]&.split(" ")&.last
       return nil unless token
 
-      User.find_by(authentication_token: token)
+      user = User.find_by(authentication_token: token)
+      return nil unless user
+
+      if user.session_expired?
+        user.invalidate_authentication_token
+        @session_expired = true
+        return nil
+      end
+
+      user.touch(:last_activity_at)
+      user
     end
 
     def authenticate_with_tv_token
@@ -26,7 +36,11 @@ class ApplicationController < ActionController::Base
     def authenticate_user!
       @current_user = authenticate_with_token
       unless @current_user
-        render json: { status: "error", message: "Authentication required" }, status: :unauthorized
+        if @session_expired
+          render json: { status: "error", message: "Sesión expirada por inactividad", session_expired: true }, status: :unauthorized
+        else
+          render json: { status: "error", message: "Authentication required" }, status: :unauthorized
+        end
       end
     end
 
@@ -39,7 +53,11 @@ class ApplicationController < ActionController::Base
         tv_session.update!(last_seen_at: Time.current)
         @is_tv = true
       else
-        render json: { status: "error", message: "Authentication required" }, status: :unauthorized
+        if @session_expired
+          render json: { status: "error", message: "Sesión expirada por inactividad", session_expired: true }, status: :unauthorized
+        else
+          render json: { status: "error", message: "Authentication required" }, status: :unauthorized
+        end
       end
     end
 

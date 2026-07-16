@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  SESSION_IDLE_TIMEOUT = 15.minutes
+
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
          :confirmable,
@@ -21,6 +23,15 @@ class User < ApplicationRecord
 
   def invalidate_authentication_token
     update!(authentication_token: nil)
+  end
+
+  def session_expired?
+    return false if last_activity_at.nil?
+    last_activity_at < SESSION_IDLE_TIMEOUT.ago
+  end
+
+  def update_last_activity!
+    update!(last_activity_at: Time.current)
   end
 
   ALL_PERMISSIONS = [
