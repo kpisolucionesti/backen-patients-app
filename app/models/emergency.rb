@@ -7,6 +7,7 @@ class Emergency < ApplicationRecord
   has_many :interconsultations, dependent: :destroy
   has_many :notes, dependent: :nullify
   has_many :vital_signs, dependent: :destroy
+  has_many :paraclinical_studies, dependent: :destroy
 
   STATUS_ATENDIDO = 1
   STATUS_ALTA = 2

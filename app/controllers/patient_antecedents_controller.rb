@@ -45,6 +45,6 @@ class PatientAntecedentsController < ApplicationController
   end
 
   def antecedent_params
-    params.permit(:condition_type, :description, :diagnosed_at, :medication, :notes)
+    params.permit(:condition_type, :description, :diagnosed_at, :medication, :notes, :category)
   end
 end

@@ -25,13 +25,13 @@ admin_permissions = [
 Profile.create!(
   name: 'Administrador',
   description: 'Acceso completo a todos los modulos',
-  permissions: admin_permissions
+  permissions: admin_permissions + ['areas.view', 'areas.create', 'areas.edit', 'areas.delete', 'rooms.create', 'rooms.edit', 'rooms.delete']
 )
 
 Profile.create!(
   name: 'User',
   description: 'Acceso basico a visualizar emergencias e historial',
-  permissions: ['emergencia.view', 'historial.view']
+  permissions: ['emergencia.view', 'emergencia.create', 'emergencia.assign_room', 'historial.view', 'pacientes.view', 'pacientes.edit']
 )
 
 admin_profile = Profile.find_by(name: 'Administrador')
@@ -221,12 +221,15 @@ medicos=[
     }
 ]
 
+adulto_area = Area.create!(name: 'Emergencia Adultos', room_type: 'adulto', description: 'Área de emergencia para pacientes adultos')
+kids_area  = Area.create!(name: 'Emergencia Pediatría', room_type: 'pediatria', description: 'Área de emergencia para pacientes pediátricos')
+
 adulto_rooms.each do |i|
-    Room.create(name: i, room_type: 'adulto')
+    Room.create(name: i, area: adulto_area)
 end
 
 kids_rooms.each do |i|
-    Room.create(name: i, room_type: 'pediatria')
+    Room.create(name: i, area: kids_area)
 end
 
 medicos.each do |i|

@@ -12,12 +12,14 @@ Rails.application.routes.draw do
     resources :antecedents, controller: 'patient_antecedents', only: [:index, :create, :update, :destroy]
   end
   resources :doctors
+  resources :areas
   resources :rooms
   resources :notes
   resources :emergencies do
     resources :medical_plans, only: [:index, :create, :update, :destroy]
     resources :vital_signs, only: [:index, :create]
     resources :interconsultations, only: [:index, :create, :update, :destroy]
+    resources :paraclinical_studies, only: [:index, :create, :update, :destroy]
   end
   resources :profiles do
     member do

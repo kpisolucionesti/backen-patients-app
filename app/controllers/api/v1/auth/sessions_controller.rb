@@ -67,6 +67,7 @@ module Api
             profile_id: user.profile_id,
             permissions: user.effective_permissions,
             is_admin: user.admin?,
+            must_change_password: user.must_change_password,
             confirmed: user.confirmed?
           }
         end

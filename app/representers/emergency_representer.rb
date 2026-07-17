@@ -13,6 +13,10 @@ class EmergencyRepresenter < Representable::Decorator
     property :egress_at
     property :classification
     property :cause_of_death
+    property :reason_for_consultation
+    property :current_illness
+    property :discharge_note
+    property :admission_note
 
     property :created_by do
         property :name

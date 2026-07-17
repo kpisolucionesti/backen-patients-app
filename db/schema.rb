@@ -10,9 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_07_25_000000) do
+ActiveRecord::Schema[7.0].define(version: 2026_07_31_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "areas", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "room_type"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_areas_on_name", unique: true
+  end
 
   create_table "doctors", force: :cascade do |t|
     t.string "name"
@@ -49,6 +58,10 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_25_000000) do
     t.datetime "egress_at"
     t.string "classification"
     t.text "cause_of_death"
+    t.text "reason_for_consultation"
+    t.text "current_illness"
+    t.text "discharge_note"
+    t.text "admission_note"
     t.index ["created_by_id"], name: "index_emergencies_on_created_by_id"
     t.index ["ingress_date"], name: "index_emergencies_on_ingress_date"
     t.index ["patient_id", "status"], name: "index_emergencies_on_patient_id_and_status"
@@ -109,6 +122,15 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_25_000000) do
     t.index ["emergency_id"], name: "index_notes_on_emergency_id"
   end
 
+  create_table "paraclinical_studies", force: :cascade do |t|
+    t.bigint "emergency_id", null: false
+    t.string "study_type", null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["emergency_id"], name: "index_paraclinical_studies_on_emergency_id"
+  end
+
   create_table "patient_allergies", force: :cascade do |t|
     t.bigint "patient_id", null: false
     t.string "allergy", null: false
@@ -128,6 +150,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_25_000000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "medication"
+    t.string "category"
     t.index ["patient_id"], name: "index_patient_antecedents_on_patient_id"
   end
 
@@ -159,11 +182,12 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_25_000000) do
   end
 
   create_table "rooms", force: :cascade do |t|
-    t.string "room_type"
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "patient_id"
+    t.bigint "area_id", null: false
+    t.index ["area_id"], name: "index_rooms_on_area_id"
   end
 
   create_table "tv_screen_events", force: :cascade do |t|
@@ -229,6 +253,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_25_000000) do
     t.string "username", null: false
     t.string "lastname"
     t.datetime "last_activity_at"
+    t.boolean "must_change_password", default: true
     t.index ["authentication_token"], name: "index_users_on_authentication_token", unique: true
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
@@ -265,9 +290,11 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_25_000000) do
   add_foreign_key "medical_plans", "users", column: "created_by_id"
   add_foreign_key "notes", "emergencies"
   add_foreign_key "notes", "users", column: "created_by_id"
+  add_foreign_key "paraclinical_studies", "emergencies"
   add_foreign_key "patient_allergies", "patients"
   add_foreign_key "patient_antecedents", "patients"
   add_foreign_key "patients", "users", column: "created_by_id"
+  add_foreign_key "rooms", "areas"
   add_foreign_key "tv_screen_events", "tv_screens"
   add_foreign_key "tv_screen_sessions", "tv_screens"
   add_foreign_key "user_activity_logs", "users"

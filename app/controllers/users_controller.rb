@@ -17,8 +17,9 @@ class UsersController < ApplicationController
         authorize!('usuarios.create')
         user = User.new(user_params)
         user.profile ||= Profile.find_by(name: 'User')
-        user.password = params[:password]
-        user.password_confirmation = params[:password_confirmation]
+        temp_password = "Emerboard20-"
+        user.password = temp_password
+        user.password_confirmation = temp_password
         user.skip_confirmation!
         if user.save
             begin
@@ -55,11 +56,15 @@ class UsersController < ApplicationController
     end
 
     def change_password
-        unless @user.valid_password?(params[:current_password])
-            return render json: { error: "Contrasena actual incorrecta" }, status: :unauthorized
+        if params[:current_password].present?
+            unless @user.valid_password?(params[:current_password])
+                return render json: { errors: ["Contrasena actual incorrecta"] }, status: :unprocessable_entity
+            end
+        else
+            authorize!('usuarios.change_password')
         end
-        if @user.update(password: params[:password], password_confirmation: params[:password_confirmation])
-            render json: { message: "Contrasena actualizada" }, status: :ok
+        if @user.update(password: params[:password], password_confirmation: params[:password_confirmation], must_change_password: false)
+            render json: { message: "Contrasena actualizada", must_change_password: false }, status: :ok
         else
             render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
         end
@@ -118,6 +123,7 @@ class UsersController < ApplicationController
             permissions: user.effective_permissions,
             is_admin: user.admin?,
             confirmed: user.confirmed?,
+            must_change_password: user.must_change_password,
             created_at: user.created_at
         }
     end

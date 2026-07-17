@@ -8,4 +8,5 @@ class PatientAntecedentRepresenter < Representable::Decorator
   property :diagnosed_at
   property :medication
   property :notes
+  property :category
 end

@@ -104,7 +104,7 @@ class EmergenciesController < ApplicationController
     private
 
     def emergency_params
-        params.permit(:patient_id, :ingress_date, :status, :medical_exit, :diagnostic, :treatment, :observations, :transfer, :classification, :cause_of_death, :egress_at)
+        params.permit(:patient_id, :ingress_date, :status, :medical_exit, :diagnostic, :treatment, :observations, :transfer, :classification, :cause_of_death, :egress_at, :reason_for_consultation, :current_illness, :discharge_note, :admission_note)
     end
 
     def assign_doctors(emergency)

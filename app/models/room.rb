@@ -1,10 +1,8 @@
 class Room < ApplicationRecord
-    # def patient_id 
-    #     Patient.find_by_id(patient)
-    # end
-    
-    scope :available, -> (){
-      where(patient_id:nil)
-    }
+  belongs_to :area
+  delegate :room_type, to: :area, allow_nil: true
 
+  validates :name, presence: true
+
+  scope :available, -> { where(patient_id: nil) }
 end

@@ -11,6 +11,8 @@ class User < ApplicationRecord
 
   validates :username, presence: true, uniqueness: { case_sensitive: false }
 
+  validate :password_complexity
+
   before_save :ensure_authentication_token
 
   def ensure_authentication_token
@@ -44,7 +46,8 @@ class User < ApplicationRecord
     'usuarios.view', 'usuarios.create', 'usuarios.edit',
     'usuarios.suspend', 'usuarios.manage_permissions', 'usuarios.change_password',
     'perfiles.view', 'perfiles.create', 'perfiles.edit', 'perfiles.delete',
-    'rooms.view',
+    'areas.view', 'areas.create', 'areas.edit', 'areas.delete',
+    'rooms.view', 'rooms.create', 'rooms.edit', 'rooms.delete',
     'notes.view', 'notes.create', 'notes.edit', 'notes.delete',
     'emergencia.assign_room',
   ].freeze
@@ -65,6 +68,15 @@ class User < ApplicationRecord
   end
 
   private
+
+  def password_complexity
+    return if password.blank?
+    errors.add :password, 'debe tener al menos 8 caracteres' if password.length < 8
+    errors.add :password, 'debe incluir al menos una mayúscula' unless password.match?(/[A-Z]/)
+    errors.add :password, 'debe incluir al menos una minúscula' unless password.match?(/[a-z]/)
+    errors.add :password, 'debe incluir al menos un número' unless password.match?(/\d/)
+    errors.add :password, 'debe incluir al menos un carácter especial' unless password.match?(/[^A-Za-z0-9]/)
+  end
 
   def generate_authentication_token
     loop do
