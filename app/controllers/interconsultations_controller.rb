@@ -14,6 +14,12 @@ class InterconsultationsController < ApplicationController
     interconsultation = @emergency.interconsultations.new(interconsultation_params)
     interconsultation.requested_by = @current_user
     if interconsultation.save
+      patient = @emergency.patient
+      UserActivityLog.create!(
+        user: @current_user,
+        action: 'create_interconsultation',
+        description: "Creó interconsulta para emergencia ##{@emergency.id} del paciente #{patient.name} #{patient.lastname}"
+      )
       render json: ::InterconsultationRepresenter.new(interconsultation), status: :created
     else
       render json: { error: interconsultation.errors.full_messages.join(', ') }, status: :unprocessable_entity
@@ -23,6 +29,12 @@ class InterconsultationsController < ApplicationController
   def update
     authorize!('emergencia.edit')
     if @interconsultation.update(interconsultation_params)
+      patient = @emergency.patient
+      UserActivityLog.create!(
+        user: @current_user,
+        action: 'update_interconsultation',
+        description: "Actualizó interconsulta para emergencia ##{@emergency.id} del paciente #{patient.name} #{patient.lastname}"
+      )
       render json: ::InterconsultationRepresenter.new(@interconsultation), status: :ok
     else
       render json: { error: @interconsultation.errors.full_messages.join(', ') }, status: :unprocessable_entity
@@ -31,6 +43,12 @@ class InterconsultationsController < ApplicationController
 
   def destroy
     authorize!('emergencia.edit')
+    patient = @emergency.patient
+    UserActivityLog.create!(
+      user: @current_user,
+      action: 'delete_interconsultation',
+      description: "Eliminó interconsulta para emergencia ##{@emergency.id} del paciente #{patient.name} #{patient.lastname}"
+    )
     @interconsultation.destroy!
     head :no_content
   end

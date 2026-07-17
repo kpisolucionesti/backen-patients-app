@@ -20,6 +20,8 @@ Rails.application.routes.draw do
     resources :vital_signs, only: [:index, :create]
     resources :interconsultations, only: [:index, :create, :update, :destroy]
     resources :paraclinical_studies, only: [:index, :create, :update, :destroy]
+    resources :physical_exams, only: [:index, :create, :update]
+    resources :laboratory_results, only: [:index, :show, :create, :update, :destroy]
   end
   resources :profiles do
     member do
@@ -49,6 +51,13 @@ Rails.application.routes.draw do
     end
     resources :events, only: [:index], controller: 'tv_screen_events'
   end
+
+  resources :lab_parameters, only: [:index, :create, :update, :destroy] do
+    collection do
+      post :import
+    end
+  end
+  resources :lab_parameter_groups, only: [:index, :create, :update, :destroy]
 
   resources :permissions, only: [:index]
 

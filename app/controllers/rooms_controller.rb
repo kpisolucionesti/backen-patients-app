@@ -16,17 +16,20 @@ class RoomsController < ApplicationController
   def create
     authorize!('rooms.create')
     room = Room.create!(room_params)
+    UserActivityLog.create!(user: @current_user, action: 'create_room', description: "Creó sala '#{room.name}'") if @current_user
     render json: ::RoomRepresenter.new(room), status: :created
   end
 
   def update
     authorize!('emergencia.assign_room')
     @room.update!(room_params)
+    UserActivityLog.create!(user: @current_user, action: 'update_room', description: "Actualizó sala '#{@room.name}'") if @current_user
     render json: ::RoomRepresenter.new(@room), status: :ok
   end
 
   def destroy
     authorize!('rooms.delete')
+    UserActivityLog.create!(user: @current_user, action: 'delete_room', description: "Eliminó sala '#{@room.name}'") if @current_user
     @room.destroy!
     head :no_content
   end

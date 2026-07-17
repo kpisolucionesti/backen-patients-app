@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_07_31_000001) do
+ActiveRecord::Schema[7.0].define(version: 2026_07_31_000009) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -29,6 +29,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_31_000001) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "status", default: "active"
+    t.string "email"
+    t.string "phone"
   end
 
   create_table "email_settings", force: :cascade do |t|
@@ -92,6 +94,45 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_31_000001) do
     t.index ["emergency_id"], name: "index_interconsultations_on_emergency_id"
     t.index ["requested_by_id"], name: "index_interconsultations_on_requested_by_id"
     t.index ["status"], name: "index_interconsultations_on_status"
+  end
+
+  create_table "lab_parameter_groups", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "lab_parameters", force: :cascade do |t|
+    t.bigint "lab_parameter_group_id"
+    t.string "name", null: false
+    t.string "unit"
+    t.integer "sort_order", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "abbreviation"
+    t.jsonb "reference_ranges", default: {}
+    t.index ["lab_parameter_group_id"], name: "index_lab_parameters_on_lab_parameter_group_id"
+  end
+
+  create_table "lab_result_values", force: :cascade do |t|
+    t.bigint "laboratory_result_id", null: false
+    t.string "parameter_name"
+    t.string "value"
+    t.string "unit"
+    t.string "reference_range"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["laboratory_result_id"], name: "index_lab_result_values_on_laboratory_result_id"
+  end
+
+  create_table "laboratory_results", force: :cascade do |t|
+    t.bigint "emergency_id", null: false
+    t.datetime "result_date"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["emergency_id"], name: "index_laboratory_results_on_emergency_id"
   end
 
   create_table "medical_plans", force: :cascade do |t|
@@ -170,6 +211,23 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_31_000001) do
     t.index ["created_by_id"], name: "index_patients_on_created_by_id"
     t.index ["lastname"], name: "index_patients_on_lastname"
     t.index ["name"], name: "index_patients_on_name"
+  end
+
+  create_table "physical_exams", force: :cascade do |t|
+    t.bigint "emergency_id", null: false
+    t.text "cabeza"
+    t.text "ojo"
+    t.text "cuello"
+    t.text "orl"
+    t.text "torax"
+    t.text "cardiovascular"
+    t.text "abdomen"
+    t.text "genitales"
+    t.text "extremidades"
+    t.text "neurologico"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["emergency_id"], name: "index_physical_exams_on_emergency_id"
   end
 
   create_table "profiles", force: :cascade do |t|
@@ -254,6 +312,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_31_000001) do
     t.string "lastname"
     t.datetime "last_activity_at"
     t.boolean "must_change_password", default: true
+    t.datetime "last_sign_in_at"
+    t.datetime "last_sign_out_at"
     t.index ["authentication_token"], name: "index_users_on_authentication_token", unique: true
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
@@ -285,6 +345,9 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_31_000001) do
   add_foreign_key "interconsultations", "doctors", column: "doctor_requested_id"
   add_foreign_key "interconsultations", "emergencies"
   add_foreign_key "interconsultations", "users", column: "requested_by_id"
+  add_foreign_key "lab_parameters", "lab_parameter_groups"
+  add_foreign_key "lab_result_values", "laboratory_results"
+  add_foreign_key "laboratory_results", "emergencies"
   add_foreign_key "medical_plans", "doctors"
   add_foreign_key "medical_plans", "emergencies"
   add_foreign_key "medical_plans", "users", column: "created_by_id"
@@ -294,6 +357,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_31_000001) do
   add_foreign_key "patient_allergies", "patients"
   add_foreign_key "patient_antecedents", "patients"
   add_foreign_key "patients", "users", column: "created_by_id"
+  add_foreign_key "physical_exams", "emergencies"
   add_foreign_key "rooms", "areas"
   add_foreign_key "tv_screen_events", "tv_screens"
   add_foreign_key "tv_screen_sessions", "tv_screens"

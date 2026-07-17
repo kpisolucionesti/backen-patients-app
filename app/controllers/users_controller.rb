@@ -28,6 +28,7 @@ class UsersController < ApplicationController
             rescue => e
                 Rails.logger.error("Error enviando correo de bienvenida: #{e.message}")
             end
+            UserActivityLog.create!(user: @current_user, action: 'create_user', description: "Creó usuario '#{user.username}' (#{user.name} #{user.lastname})")
             render json: user_response(user), status: :created
         else
             render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
@@ -40,6 +41,7 @@ class UsersController < ApplicationController
             return render json: { error: "No se puede modificar este usuario" }, status: :forbidden
         end
         if @user.update(update_params)
+            UserActivityLog.create!(user: @current_user, action: 'update_user', description: "Actualizó usuario '#{@user.username}' (#{@user.name} #{@user.lastname})")
             render json: user_response(@user), status: :ok
         else
             render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
@@ -51,6 +53,7 @@ class UsersController < ApplicationController
         if @user.protected?
             return render json: { error: "No se puede eliminar este usuario" }, status: :forbidden
         end
+        UserActivityLog.create!(user: @current_user, action: 'delete_user', description: "Eliminó usuario '#{@user.username}' (#{@user.name} #{@user.lastname})")
         @user.destroy
         head :no_content
     end
@@ -64,6 +67,7 @@ class UsersController < ApplicationController
             authorize!('usuarios.change_password')
         end
         if @user.update(password: params[:password], password_confirmation: params[:password_confirmation], must_change_password: false)
+            UserActivityLog.create!(user: @current_user, action: 'change_password', description: "Cambió contraseña de usuario '#{@user.username}'")
             render json: { message: "Contrasena actualizada", must_change_password: false }, status: :ok
         else
             render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
@@ -77,6 +81,7 @@ class UsersController < ApplicationController
             return render json: { error: "No se puede modificar este usuario" }, status: :forbidden
         end
         if @user.update(permissions: params[:permissions], profile_id: params[:profile_id])
+            UserActivityLog.create!(user: @current_user, action: 'update_user_permissions', description: "Actualizó permisos de usuario '#{@user.username}'")
             render json: user_response(@user), status: :ok
         else
             render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity

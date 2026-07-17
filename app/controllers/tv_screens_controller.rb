@@ -28,6 +28,7 @@ class TvScreensController < ApplicationController
 
     if screen.save
       screen.events.create!(event_type: 'created', metadata: { by: @current_user&.name })
+      UserActivityLog.create!(user: @current_user, action: 'create_tv_screen', description: "Creó pantalla TV '#{screen.name}'")
       render json: TvScreenRepresenter.new(screen), status: :created
     else
       render json: { error: 'No se pudo guardar', errors: screen.errors.full_messages }, status: :unprocessable_entity
@@ -44,6 +45,7 @@ class TvScreensController < ApplicationController
     end
 
     if @tv_screen.update(update_attrs)
+      UserActivityLog.create!(user: @current_user, action: 'update_tv_screen', description: "Actualizó pantalla TV '#{@tv_screen.name}'")
       render json: TvScreenRepresenter.new(@tv_screen), status: :ok
     else
       render json: { error: 'No se pudo guardar' }, status: :unprocessable_entity
@@ -55,6 +57,7 @@ class TvScreensController < ApplicationController
     if @tv_screen.sessions.active.exists?
       render json: { error: 'No se puede eliminar una pantalla con sesiones activas. Desconéctela primero.' }, status: :unprocessable_entity
     else
+      UserActivityLog.create!(user: @current_user, action: 'delete_tv_screen', description: "Eliminó pantalla TV '#{@tv_screen.name}'")
       @tv_screen.destroy
       render json: { message: 'Pantalla eliminada' }, status: :ok
     end
@@ -66,6 +69,7 @@ class TvScreensController < ApplicationController
     @tv_screen.update!(pin_digest: TvScreen.pin_digest(new_pin))
     @tv_screen.sessions.active.update_all(revoked_at: Time.current)
     @tv_screen.events.create!(event_type: 'pin_changed', metadata: { by: @current_user&.name, regenerated: true })
+    UserActivityLog.create!(user: @current_user, action: 'regenerate_tv_pin', description: "Regeneró PIN de pantalla TV '#{@tv_screen.name}'")
     render json: { pin: new_pin, message: 'PIN regenerado exitosamente' }, status: :ok
   end
 
@@ -74,6 +78,7 @@ class TvScreensController < ApplicationController
     count = @tv_screen.sessions.active.count
     @tv_screen.sessions.active.update_all(revoked_at: Time.current)
     @tv_screen.events.create!(event_type: 'disconnected', metadata: { by: @current_user&.name, sessions_revoked: count })
+    UserActivityLog.create!(user: @current_user, action: 'revoke_tv_sessions', description: "Revocó #{count} sesiones de pantalla TV '#{@tv_screen.name}'")
     render json: { message: "#{count} sesion(es) revocada(s)" }, status: :ok
   end
 

@@ -16,17 +16,20 @@ class DoctorsController < ApplicationController
     def create
         authorize!('medicos.create')
         doctor = Doctor.create!(doctor_params)
+        UserActivityLog.create!(user: @current_user, action: 'create_doctor', description: "Creó médico '#{doctor.name}'")
         render json: DoctorRepresenter.new(doctor), status: :created
     end
 
     def update
         authorize!('medicos.edit')
         @doctor.update!(doctor_params)
+        UserActivityLog.create!(user: @current_user, action: 'update_doctor', description: "Actualizó médico '#{@doctor.name}'")
         render json: DoctorRepresenter.new(@doctor), status: :ok
     end
 
     def destroy
         authorize!('medicos.suspend')
+        UserActivityLog.create!(user: @current_user, action: 'delete_doctor', description: "Eliminó médico '#{@doctor.name}'")
         @doctor.destroy!
         head :no_content
     end
@@ -34,7 +37,7 @@ class DoctorsController < ApplicationController
     private
 
     def doctor_params
-        params.permit(:name, :speciality, :status)
+        params.permit(:name, :speciality, :email, :phone, :status)
     end
 
     def set_doctor

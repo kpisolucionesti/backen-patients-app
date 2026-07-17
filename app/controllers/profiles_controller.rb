@@ -16,12 +16,14 @@ class ProfilesController < ApplicationController
     def create
         authorize!('perfiles.create')
         profile = Profile.create!(profile_params)
+        UserActivityLog.create!(user: @current_user, action: 'create_profile', description: "Creó perfil '#{profile.name}'")
         render json: profile_response(profile), status: :created
     end
 
     def update
         authorize!('perfiles.edit')
         @profile.update!(profile_params)
+        UserActivityLog.create!(user: @current_user, action: 'update_profile', description: "Actualizó perfil '#{@profile.name}'")
         render json: profile_response(@profile), status: :ok
     end
 
@@ -33,6 +35,7 @@ class ProfilesController < ApplicationController
         if @profile.users.any?
             return render json: { error: "No se puede eliminar un perfil con usuarios asignados" }, status: :unprocessable_entity
         end
+        UserActivityLog.create!(user: @current_user, action: 'delete_profile', description: "Eliminó perfil '#{@profile.name}'")
         @profile.destroy!
         head :no_content
     end

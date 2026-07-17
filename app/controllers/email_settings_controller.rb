@@ -18,6 +18,7 @@ class EmailSettingsController < ApplicationController
     def update
         settings = EmailSetting.first_or_initialize
         if settings.update(email_settings_params)
+            UserActivityLog.create!(user: @current_user, action: 'update_email_settings', description: "Actualizó configuración de correo")
             render json: { message: "Configuracion guardada exitosamente" }, status: :ok
         else
             render json: { error: settings.errors.full_messages.join(', ') }, status: :unprocessable_entity
@@ -28,6 +29,7 @@ class EmailSettingsController < ApplicationController
         settings = EmailSetting.new(test_params)
         result = settings.send_test_email
         if result[:success]
+            UserActivityLog.create!(user: @current_user, action: 'test_email_settings', description: "Probó configuración de correo enviando a #{test_params[:sender_email]}")
             render json: { message: result[:message] }, status: :ok
         else
             render json: { error: result[:error] }, status: :unprocessable_entity

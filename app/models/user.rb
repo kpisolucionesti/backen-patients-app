@@ -50,6 +50,7 @@ class User < ApplicationRecord
     'rooms.view', 'rooms.create', 'rooms.edit', 'rooms.delete',
     'notes.view', 'notes.create', 'notes.edit', 'notes.delete',
     'emergencia.assign_room',
+    'lab_params.view', 'lab_params.edit',
   ].freeze
 
   def effective_permissions

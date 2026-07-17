@@ -14,7 +14,13 @@ module Api
               end
               user.ensure_authentication_token
               user.last_activity_at = Time.current
+              user.last_sign_in_at = Time.current
               user.save!
+              UserActivityLog.create!(
+                user: user,
+                action: 'sign_in',
+                description: "Inició sesión"
+              )
               render json: {
                 status: "success",
                 message: "Signed in successfully",
@@ -39,6 +45,13 @@ module Api
           user = authenticate_with_token
           if user
             user.invalidate_authentication_token
+            user.last_sign_out_at = Time.current
+            user.save!
+            UserActivityLog.create!(
+              user: user,
+              action: 'sign_out',
+              description: "Cerró sesión"
+            )
             render json: {
               status: "success",
               message: "Signed out successfully"

@@ -8,6 +8,8 @@ class Emergency < ApplicationRecord
   has_many :notes, dependent: :nullify
   has_many :vital_signs, dependent: :destroy
   has_many :paraclinical_studies, dependent: :destroy
+  has_one :physical_exam, dependent: :destroy
+  has_many :laboratory_results, dependent: :destroy
 
   STATUS_ATENDIDO = 1
   STATUS_ALTA = 2

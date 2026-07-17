@@ -12,6 +12,12 @@ class ParaclinicalStudiesController < ApplicationController
     authorize!('emergencia.edit')
     study = @emergency.paraclinical_studies.new(study_params)
     if study.save
+      patient = @emergency.patient
+      UserActivityLog.create!(
+        user: @current_user,
+        action: 'create_paraclinical_study',
+        description: "Creó estudio paraclínico para emergencia ##{@emergency.id} del paciente #{patient.name} #{patient.lastname}"
+      )
       render json: ::ParaclinicalStudyRepresenter.new(study), status: :created
     else
       render json: { error: study.errors.full_messages.join(', ') }, status: :unprocessable_entity
@@ -22,6 +28,12 @@ class ParaclinicalStudiesController < ApplicationController
     authorize!('emergencia.edit')
     study = @emergency.paraclinical_studies.find(params[:id])
     if study.update(study_params)
+      patient = @emergency.patient
+      UserActivityLog.create!(
+        user: @current_user,
+        action: 'update_paraclinical_study',
+        description: "Actualizó estudio paraclínico para emergencia ##{@emergency.id} del paciente #{patient.name} #{patient.lastname}"
+      )
       render json: ::ParaclinicalStudyRepresenter.new(study), status: :ok
     else
       render json: { error: study.errors.full_messages.join(', ') }, status: :unprocessable_entity
@@ -31,6 +43,12 @@ class ParaclinicalStudiesController < ApplicationController
   def destroy
     authorize!('emergencia.edit')
     study = @emergency.paraclinical_studies.find(params[:id])
+    patient = @emergency.patient
+    UserActivityLog.create!(
+      user: @current_user,
+      action: 'delete_paraclinical_study',
+      description: "Eliminó estudio paraclínico para emergencia ##{@emergency.id} del paciente #{patient.name} #{patient.lastname}"
+    )
     study.destroy!
     head :no_content
   end
