@@ -51,6 +51,9 @@ class User < ApplicationRecord
     'notes.view', 'notes.create', 'notes.edit', 'notes.delete',
     'emergencia.assign_room',
     'lab_params.view', 'lab_params.edit',
+    'hospitalizacion.view', 'hospitalizacion.edit', 'hospitalizacion.nursing',
+    'quirofano.view', 'quirofano.schedule', 'quirofano.edit',
+    'uci.view', 'uci.edit', 'uci.nursing',
   ].freeze
 
   def effective_permissions

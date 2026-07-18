@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_07_31_000009) do
+ActiveRecord::Schema[7.0].define(version: 2026_08_03_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -79,6 +79,60 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_31_000009) do
     t.datetime "updated_at", null: false
     t.index ["doctor_id"], name: "index_emergency_doctors_on_doctor_id"
     t.index ["emergency_id"], name: "index_emergency_doctors_on_emergency_id"
+  end
+
+  create_table "fluid_balances", force: :cascade do |t|
+    t.bigint "hospitalization_id", null: false
+    t.bigint "recorded_by_id"
+    t.string "balance_type", null: false
+    t.string "fluid_type", null: false
+    t.decimal "amount", precision: 8, scale: 2, null: false
+    t.string "unit", default: "ml"
+    t.datetime "recorded_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hospitalization_id"], name: "index_fluid_balances_on_hospitalization_id"
+    t.index ["recorded_at"], name: "index_fluid_balances_on_recorded_at"
+    t.index ["recorded_by_id"], name: "index_fluid_balances_on_recorded_by_id"
+  end
+
+  create_table "hospitalization_notes", force: :cascade do |t|
+    t.bigint "hospitalization_id", null: false
+    t.bigint "created_by_id"
+    t.string "note_type", default: "progress", null: false
+    t.string "shift"
+    t.text "subjective"
+    t.text "objective"
+    t.text "assessment"
+    t.text "plan"
+    t.datetime "recorded_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_hospitalization_notes_on_created_by_id"
+    t.index ["hospitalization_id"], name: "index_hospitalization_notes_on_hospitalization_id"
+    t.index ["note_type"], name: "index_hospitalization_notes_on_note_type"
+    t.index ["recorded_at"], name: "index_hospitalization_notes_on_recorded_at"
+  end
+
+  create_table "hospitalizations", force: :cascade do |t|
+    t.bigint "emergency_id", null: false
+    t.bigint "room_id"
+    t.bigint "admitting_doctor_id"
+    t.bigint "attending_doctor_id"
+    t.text "admission_diagnosis"
+    t.text "discharge_diagnosis"
+    t.text "discharge_summary"
+    t.datetime "admission_date", null: false
+    t.datetime "discharge_date"
+    t.string "status", default: "active"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admitting_doctor_id"], name: "index_hospitalizations_on_admitting_doctor_id"
+    t.index ["attending_doctor_id"], name: "index_hospitalizations_on_attending_doctor_id"
+    t.index ["emergency_id", "status"], name: "index_hospitalizations_on_emergency_id_and_status", unique: true, where: "((status)::text = 'active'::text)"
+    t.index ["emergency_id"], name: "index_hospitalizations_on_emergency_id"
+    t.index ["room_id"], name: "index_hospitalizations_on_room_id"
+    t.index ["status"], name: "index_hospitalizations_on_status"
   end
 
   create_table "interconsultations", force: :cascade do |t|
@@ -150,6 +204,27 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_31_000009) do
     t.index ["emergency_id"], name: "index_medical_plans_on_emergency_id"
     t.index ["indication_type"], name: "index_medical_plans_on_indication_type"
     t.index ["status"], name: "index_medical_plans_on_status"
+  end
+
+  create_table "medication_administrations", force: :cascade do |t|
+    t.bigint "hospitalization_id", null: false
+    t.bigint "medical_plan_id"
+    t.bigint "administered_by_id"
+    t.string "medication_name", null: false
+    t.string "dosage"
+    t.string "route"
+    t.string "frequency"
+    t.datetime "scheduled_at"
+    t.datetime "administered_at"
+    t.string "status", default: "scheduled"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["administered_by_id"], name: "index_medication_administrations_on_administered_by_id"
+    t.index ["hospitalization_id"], name: "index_medication_administrations_on_hospitalization_id"
+    t.index ["medical_plan_id"], name: "index_medication_administrations_on_medical_plan_id"
+    t.index ["scheduled_at"], name: "index_medication_administrations_on_scheduled_at"
+    t.index ["status"], name: "index_medication_administrations_on_status"
   end
 
   create_table "notes", force: :cascade do |t|
@@ -248,6 +323,21 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_31_000009) do
     t.index ["area_id"], name: "index_rooms_on_area_id"
   end
 
+  create_table "surgeries", force: :cascade do |t|
+    t.bigint "hospitalization_id", null: false
+    t.string "surgery_type"
+    t.text "description"
+    t.string "surgeon_name"
+    t.datetime "surgery_date"
+    t.string "status", default: "scheduled"
+    t.text "preop_notes"
+    t.text "postop_notes"
+    t.text "result"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hospitalization_id"], name: "index_surgeries_on_hospitalization_id"
+  end
+
   create_table "tv_screen_events", force: :cascade do |t|
     t.bigint "tv_screen_id", null: false
     t.string "event_type", null: false
@@ -334,6 +424,13 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_31_000009) do
     t.bigint "recorded_by_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "glucose", precision: 6, scale: 2
+    t.integer "gcs_eye"
+    t.integer "gcs_verbal"
+    t.integer "gcs_motor"
+    t.string "pupil_left"
+    t.string "pupil_right"
+    t.integer "pain_scale"
     t.index ["emergency_id"], name: "index_vital_signs_on_emergency_id"
     t.index ["recorded_by_id"], name: "index_vital_signs_on_recorded_by_id"
   end
@@ -342,6 +439,14 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_31_000009) do
   add_foreign_key "emergencies", "users", column: "created_by_id"
   add_foreign_key "emergency_doctors", "doctors"
   add_foreign_key "emergency_doctors", "emergencies"
+  add_foreign_key "fluid_balances", "hospitalizations"
+  add_foreign_key "fluid_balances", "users", column: "recorded_by_id"
+  add_foreign_key "hospitalization_notes", "hospitalizations"
+  add_foreign_key "hospitalization_notes", "users", column: "created_by_id"
+  add_foreign_key "hospitalizations", "doctors", column: "admitting_doctor_id"
+  add_foreign_key "hospitalizations", "doctors", column: "attending_doctor_id"
+  add_foreign_key "hospitalizations", "emergencies"
+  add_foreign_key "hospitalizations", "rooms"
   add_foreign_key "interconsultations", "doctors", column: "doctor_requested_id"
   add_foreign_key "interconsultations", "emergencies"
   add_foreign_key "interconsultations", "users", column: "requested_by_id"
@@ -351,6 +456,9 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_31_000009) do
   add_foreign_key "medical_plans", "doctors"
   add_foreign_key "medical_plans", "emergencies"
   add_foreign_key "medical_plans", "users", column: "created_by_id"
+  add_foreign_key "medication_administrations", "hospitalizations"
+  add_foreign_key "medication_administrations", "medical_plans"
+  add_foreign_key "medication_administrations", "users", column: "administered_by_id"
   add_foreign_key "notes", "emergencies"
   add_foreign_key "notes", "users", column: "created_by_id"
   add_foreign_key "paraclinical_studies", "emergencies"
@@ -359,6 +467,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_07_31_000009) do
   add_foreign_key "patients", "users", column: "created_by_id"
   add_foreign_key "physical_exams", "emergencies"
   add_foreign_key "rooms", "areas"
+  add_foreign_key "surgeries", "hospitalizations"
   add_foreign_key "tv_screen_events", "tv_screens"
   add_foreign_key "tv_screen_sessions", "tv_screens"
   add_foreign_key "user_activity_logs", "users"

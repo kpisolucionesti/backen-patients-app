@@ -10,6 +10,7 @@ class Emergency < ApplicationRecord
   has_many :paraclinical_studies, dependent: :destroy
   has_one :physical_exam, dependent: :destroy
   has_many :laboratory_results, dependent: :destroy
+  has_one :hospitalization, dependent: :destroy
 
   STATUS_ATENDIDO = 1
   STATUS_ALTA = 2

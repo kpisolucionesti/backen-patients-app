@@ -9,10 +9,19 @@ class VitalSignRepresenter < Representable::Decorator
   property :respiratory_rate
   property :temperature
   property :oxygen_saturation
+  property :glucose
+  property :gcs_eye
+  property :gcs_verbal
+  property :gcs_motor
+  property :pupil_left
+  property :pupil_right
+  property :pain_scale
+  property :gcs_total
   property :recorded_at
 
   property :recorded_by do
     property :id
     property :name
+    property :lastname
   end
 end

@@ -94,3 +94,33 @@ groups:
         label: Editar
       - key: notes.delete
         label: Eliminar
+
+  - section: Hospitalización
+    color: '#fce4ec'
+    permissions:
+      - key: hospitalizacion.view
+        label: Ver
+      - key: hospitalizacion.edit
+        label: Editar
+      - key: hospitalizacion.nursing
+        label: Enfermería
+
+  - section: Quirófano
+    color: '#f3e5f5'
+    permissions:
+      - key: quirofano.view
+        label: Ver
+      - key: quirofano.edit
+        label: Editar
+      - key: quirofano.schedule
+        label: Programar
+
+  - section: UCI
+    color: '#e0f2f1'
+    permissions:
+      - key: uci.view
+        label: Ver
+      - key: uci.edit
+        label: Editar
+      - key: uci.nursing
+        label: Enfermería

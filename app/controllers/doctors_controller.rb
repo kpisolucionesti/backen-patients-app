@@ -5,6 +5,17 @@ class DoctorsController < ApplicationController
     def index
         authorize!('medicos.view')
         doctors = Doctor.all
+        if params[:emergency_id].present?
+            emergency = Emergency.find(params[:emergency_id])
+            exclude_ids = []
+            exclude_ids << emergency.primary_doctor&.id
+            if emergency.hospitalization
+                exclude_ids << emergency.hospitalization.attending_doctor_id
+                exclude_ids << emergency.hospitalization.admitting_doctor_id
+            end
+            exclude_ids.compact!
+            doctors = doctors.where.not(id: exclude_ids) if exclude_ids.any?
+        end
         render json: ::DoctorRepresenter.for_collection.new(doctors),status: :ok
     end
 

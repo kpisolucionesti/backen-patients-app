@@ -22,6 +22,27 @@ Rails.application.routes.draw do
     resources :paraclinical_studies, only: [:index, :create, :update, :destroy]
     resources :physical_exams, only: [:index, :create, :update]
     resources :laboratory_results, only: [:index, :show, :create, :update, :destroy]
+    resource  :hospitalization, only: [:show, :create, :update] do
+      member do
+        post :discharge
+      end
+    end
+  end
+
+  resource :direct_admission, only: [:create], controller: 'direct_admissions'
+
+  resources :hospitalizations, only: [] do
+    collection do
+      get :census
+    end
+    resources :hospitalization_notes, only: [:index, :create, :update, :destroy]
+    resources :fluid_balances, only: [:index, :create, :update, :destroy] do
+      collection do
+        get :summary
+      end
+    end
+    resources :medication_administrations, only: [:index, :create, :update, :destroy]
+    resources :surgeries, only: [:index, :create, :update, :destroy]
   end
   resources :profiles do
     member do
