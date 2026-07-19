@@ -11,7 +11,10 @@ Rails.application.routes.draw do
     resources :allergies, controller: 'patient_allergies', only: [:index, :create, :update, :destroy]
     resources :antecedents, controller: 'patient_antecedents', only: [:index, :create, :update, :destroy]
   end
-  resources :doctors
+  resources :doctors do
+    resource :schedules, only: [:show, :update], controller: 'doctor_schedules'
+  end
+  resources :specialties
   resources :areas
   resources :rooms
   resources :notes
@@ -34,6 +37,7 @@ Rails.application.routes.draw do
   resources :hospitalizations, only: [] do
     collection do
       get :census
+      get :historical
     end
     resources :hospitalization_notes, only: [:index, :create, :update, :destroy]
     resources :fluid_balances, only: [:index, :create, :update, :destroy] do
@@ -43,6 +47,11 @@ Rails.application.routes.draw do
     end
     resources :medication_administrations, only: [:index, :create, :update, :destroy]
     resources :surgeries, only: [:index, :create, :update, :destroy]
+  end
+  resources :surgeries, only: [] do
+    collection do
+      get :search
+    end
   end
   resources :profiles do
     member do
@@ -84,6 +93,18 @@ Rails.application.routes.draw do
 
   resource :email_settings, only: [:show, :update] do
     post :test
+  end
+
+  resources :appointment_displays
+
+  resources :appointments, only: [:index, :show, :create, :update] do
+    member do
+      post :complete
+    end
+    collection do
+      get :available_slots
+    end
+    resource :record, only: [:show, :create, :update], controller: 'appointment_records'
   end
 
   get 'dashboard/stats', to: 'dashboard#stats'

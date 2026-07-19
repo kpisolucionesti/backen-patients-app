@@ -10,9 +10,57 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_08_03_000000) do
+ActiveRecord::Schema[7.0].define(version: 2026_08_07_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "appointment_displays", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "location"
+    t.bigint "specialty_id"
+    t.boolean "is_active", default: true, null: false
+    t.string "public_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["public_id"], name: "index_appointment_displays_on_public_id", unique: true
+    t.index ["specialty_id"], name: "index_appointment_displays_on_specialty_id"
+  end
+
+  create_table "appointment_records", force: :cascade do |t|
+    t.bigint "appointment_id", null: false
+    t.text "reason_for_consultation"
+    t.text "current_illness"
+    t.text "diagnostic"
+    t.text "treatment"
+    t.text "observations"
+    t.jsonb "vital_signs"
+    t.bigint "created_by_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appointment_id"], name: "index_appointment_records_on_appointment_id", unique: true
+    t.index ["created_by_id"], name: "index_appointment_records_on_created_by_id"
+  end
+
+  create_table "appointments", force: :cascade do |t|
+    t.bigint "patient_id", null: false
+    t.bigint "doctor_id", null: false
+    t.bigint "specialty_id", null: false
+    t.date "appointment_date", null: false
+    t.time "start_time"
+    t.time "end_time"
+    t.string "status", default: "scheduled", null: false
+    t.integer "turn_number"
+    t.text "notes"
+    t.bigint "created_by_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appointment_date", "status"], name: "index_appointments_on_appointment_date_and_status"
+    t.index ["created_by_id"], name: "index_appointments_on_created_by_id"
+    t.index ["doctor_id", "appointment_date"], name: "index_appointments_on_doctor_id_and_appointment_date"
+    t.index ["doctor_id"], name: "index_appointments_on_doctor_id"
+    t.index ["patient_id"], name: "index_appointments_on_patient_id"
+    t.index ["specialty_id"], name: "index_appointments_on_specialty_id"
+  end
 
   create_table "areas", force: :cascade do |t|
     t.string "name", null: false
@@ -23,14 +71,30 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_03_000000) do
     t.index ["name"], name: "index_areas_on_name", unique: true
   end
 
+  create_table "doctor_schedules", force: :cascade do |t|
+    t.bigint "doctor_id", null: false
+    t.integer "day_of_week", null: false
+    t.time "start_time", null: false
+    t.time "end_time", null: false
+    t.integer "appointment_duration", default: 30, null: false
+    t.string "appointment_mode", default: "scheduled", null: false
+    t.integer "max_patients", default: 0
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["doctor_id", "day_of_week"], name: "idx_doctor_schedules_on_doctor_and_day"
+    t.index ["doctor_id"], name: "index_doctor_schedules_on_doctor_id"
+  end
+
   create_table "doctors", force: :cascade do |t|
     t.string "name"
-    t.string "speciality"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "status", default: "active"
     t.string "email"
     t.string "phone"
+    t.bigint "specialty_id"
+    t.index ["specialty_id"], name: "index_doctors_on_specialty_id"
   end
 
   create_table "email_settings", force: :cascade do |t|
@@ -323,6 +387,15 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_03_000000) do
     t.index ["area_id"], name: "index_rooms_on_area_id"
   end
 
+  create_table "specialties", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_specialties_on_name", unique: true
+  end
+
   create_table "surgeries", force: :cascade do |t|
     t.bigint "hospitalization_id", null: false
     t.string "surgery_type"
@@ -425,16 +498,22 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_03_000000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "glucose", precision: 6, scale: 2
-    t.integer "gcs_eye"
-    t.integer "gcs_verbal"
-    t.integer "gcs_motor"
-    t.string "pupil_left"
-    t.string "pupil_right"
-    t.integer "pain_scale"
+    t.decimal "height", precision: 5, scale: 1
+    t.decimal "weight", precision: 5, scale: 1
+    t.decimal "bmi", precision: 4, scale: 1
     t.index ["emergency_id"], name: "index_vital_signs_on_emergency_id"
     t.index ["recorded_by_id"], name: "index_vital_signs_on_recorded_by_id"
   end
 
+  add_foreign_key "appointment_displays", "specialties"
+  add_foreign_key "appointment_records", "appointments"
+  add_foreign_key "appointment_records", "users", column: "created_by_id"
+  add_foreign_key "appointments", "doctors"
+  add_foreign_key "appointments", "patients"
+  add_foreign_key "appointments", "specialties"
+  add_foreign_key "appointments", "users", column: "created_by_id"
+  add_foreign_key "doctor_schedules", "doctors"
+  add_foreign_key "doctors", "specialties"
   add_foreign_key "emergencies", "patients"
   add_foreign_key "emergencies", "users", column: "created_by_id"
   add_foreign_key "emergency_doctors", "doctors"

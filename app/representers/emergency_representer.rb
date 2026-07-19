@@ -10,6 +10,7 @@ class EmergencyRepresenter < Representable::Decorator
     property :observations
     property :transfer
     property :created_at
+    property :updated_at
     property :egress_at
     property :classification
     property :cause_of_death

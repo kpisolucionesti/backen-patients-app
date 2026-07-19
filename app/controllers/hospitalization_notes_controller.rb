@@ -24,6 +24,10 @@ class HospitalizationNotesController < ApplicationController
 
   def update
     authorize!('hospitalizacion.edit')
+    unless @current_user.admin? || @note.created_by_id == @current_user.id
+      render json: { error: 'No autorizado: solo el creador puede editar esta nota' }, status: :forbidden
+      return
+    end
     if @note.update(note_params)
       render json: ::HospitalizationNoteRepresenter.new(@note), status: :ok
     else
@@ -33,6 +37,10 @@ class HospitalizationNotesController < ApplicationController
 
   def destroy
     authorize!('hospitalizacion.edit')
+    unless @current_user.admin? || @note.created_by_id == @current_user.id
+      render json: { error: 'No autorizado: solo el creador puede eliminar esta nota' }, status: :forbidden
+      return
+    end
     @note.destroy!
     head :no_content
   end

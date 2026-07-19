@@ -10,13 +10,9 @@ class VitalSignRepresenter < Representable::Decorator
   property :temperature
   property :oxygen_saturation
   property :glucose
-  property :gcs_eye
-  property :gcs_verbal
-  property :gcs_motor
-  property :pupil_left
-  property :pupil_right
-  property :pain_scale
-  property :gcs_total
+  property :height
+  property :weight
+  property :bmi
   property :recorded_at
 
   property :recorded_by do

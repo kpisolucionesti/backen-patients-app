@@ -1,5 +1,5 @@
 class HospitalizationNote < ApplicationRecord
-  belongs_to :hospitalization
+  belongs_to :hospitalization, touch: true
   belongs_to :created_by, class_name: 'User', optional: true
 
   validates :note_type, inclusion: { in: %w[progress nursing admission discharge] }

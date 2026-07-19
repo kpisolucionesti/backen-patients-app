@@ -90,6 +90,12 @@ end
 
 # ─── Doctors ──────────────────────────────────────────────────────────────────
 
+def find_or_create_specialty(name)
+  Specialty.find_or_create_by!(name: name.upcase.strip) do |s|
+    s.description = "Especialidad de #{name.downcase.strip}"
+  end
+end
+
 def import_doctors(content)
   cols = %w[id name speciality created_at updated_at]
   rows = parse_copy_data(content, "doctors", cols)
@@ -103,9 +109,10 @@ def import_doctors(content)
   imported = 0
   rows.each do |row|
     _old_id, name, speciality, created_at, updated_at = row
+    specialty = find_or_create_specialty(speciality || 'GENERAL')
     Doctor.create!(
       name: name.strip,
-      speciality: speciality&.strip,
+      specialty: specialty,
       status: "active",
       created_at: created_at,
       updated_at: updated_at
@@ -116,9 +123,10 @@ def import_doctors(content)
   end
 
   unless Doctor.find_by(name: "YASMIN ALFONZO")
+    specialty = find_or_create_specialty('GASTROENTEROLOGIA')
     Doctor.create!(
       name: "YASMIN ALFONZO",
-      speciality: "GASTROENTEROLOGIA",
+      specialty: specialty,
       status: "active"
     )
     imported += 1
@@ -212,9 +220,10 @@ def import_patients_with_emergencies(content)
       doc_name = current_doctor.strip
       doctor = Doctor.find_by("UPPER(name) = ?", doc_name.upcase)
       unless doctor
+        specialty = find_or_create_specialty('NO ESPECIFICADA')
         doctor = Doctor.create!(
           name: doc_name,
-          speciality: "NO ESPECIFICADA",
+          specialty: specialty,
           status: "active"
         )
         batch_warnings << "Created missing doctor '#{doc_name}' (referenced by patient #{patient_name})"

@@ -1,6 +1,29 @@
 class HospitalizationsController < ApplicationController
   before_action :authenticate_user!
 
+  def historical
+    authorize!('hospitalizacion.view')
+    hospitalizations = Hospitalization.where(status: 'discharged')
+                                      .includes(emergency: [:patient, :doctors])
+                                      .order(discharge_date: :desc)
+
+    if params[:q].present?
+      q = "%#{params[:q]}%"
+      patient_ids = Patient.where("name ILIKE ? OR lastname ILIKE ? OR ci ILIKE ?", q, q, q).pluck(:id)
+      hospitalizations = hospitalizations.where(emergencies: { patient_id: patient_ids })
+    end
+
+    total = hospitalizations.count
+    page = (params[:page] || 1).to_i
+    per_page = (params[:per_page] || 50).to_i
+    hospitalizations = hospitalizations.page(page).per(per_page)
+
+    render json: {
+      data: ::HospitalizationRepresenter.for_collection.new(hospitalizations),
+      total: total
+    }, status: :ok
+  end
+
   def show
     authorize!('hospitalizacion.view')
     hospitalization = Hospitalization.find_by!(emergency_id: params[:emergency_id])

@@ -1,9 +1,12 @@
+UserActivityLog.destroy_all
+DoctorSchedule.destroy_all
 EmergencyDoctor.destroy_all
 Emergency.destroy_all
 Note.destroy_all
 Patient.destroy_all
 Room.destroy_all
 Doctor.destroy_all
+Specialty.destroy_all
 User.destroy_all
 Profile.destroy_all
 
@@ -20,6 +23,9 @@ admin_permissions = [
   'rooms.view',
   'notes.view', 'notes.create', 'notes.edit', 'notes.delete',
   'emergencia.assign_room',
+  'especialidades.view', 'especialidades.create', 'especialidades.edit', 'especialidades.delete',
+  'agenda.edit',
+  'citas.view', 'citas.create', 'citas.edit', 'citas.delete', 'citas.attend',
 ]
 
 Profile.create!(
@@ -39,8 +45,8 @@ admin_profile = Profile.find_by(name: 'Administrador')
 User.create!(
   email: "admin@emerboard.com",
   username: "admin",
-  password: "123456",
-  password_confirmation: "123456",
+  password: "Admin123456!",
+  password_confirmation: "Admin123456!",
   name: "Admin",
   profile: admin_profile,
   status: 'active',
@@ -70,155 +76,56 @@ kids_rooms=[
     'Traumashock',
 ]
 
-medicos=[
-    {
-        name: "ALBA AMUNDARAY",
-        speciality: "CIRUGIA PLASTICA"
-    },
-    {
-        name: "ALEXANDER MORALES",
-        speciality: "CIRUGIA GENERAL"
-    },
-    {
-        name: "ANIBAL ROJAS",
-        speciality: "ODONTOLOGIA"
-    },
-    {
-        name: "AURA CONTRERAS",
-        speciality: "NEUROCIRUGIA"
-    },
-    {
-        name: "CARLA GONZALEZ",
-        speciality: "ORL"
-    },
-    {
-        name: "CRUZ GARBAN",
-        speciality: "GINECOLOGIA"
-    },
-    {
-        name: "DAVID MAGO",
-        speciality: "GASTROENTEROLOGIA"
-    },
-    {
-        name: "EDGAR VALOA",
-        speciality: "NEUMONOLOGIA"
-    },
-    {
-        name: "EDUARDO BILBAO",
-        speciality: "TRAUMATOLOGIA"
-    },
-    {
-        name: "FRANKY TORRES",
-        speciality: "INTENSIVISTA"
-    },
-    {
-        name: "GERSON ZAMBRANO",
-        speciality: "INTENSIVISTA"
-    },
-    {
-        name: "GIANCARLO ROTUNNO",
-        speciality: "UROLOGIA"
-    },
-    {
-        name: "GLADYS MOTA",
-        speciality: "MEDICINA INTERNA"
-    },
-    {
-        name: "IGOR MARQUEZ",
-        speciality: "NEUROCIRUGIA"
-    },
-    {
-        name: "JENNY MARTINEZ",
-        speciality: "MEDICINA INTERNA"
-    },
-    {
-        name: "JHOSBELIS GARCIA",
-        speciality: "MEDICINA INTERNA"
-    },
-    {
-        name: "JOSE MEDINA",
-        speciality: "UROLOGIA"
-    },
-    {
-        name: "JOSE NEGRIN",
-        speciality: "TRAUMATOLOGIA"
-    },
-    {
-        name: "JOSE RAMON NOYA",
-        speciality: "CIRUGIA GENERAL"
-    },
-    {
-        name: "JOSE SANGUINO",
-        speciality: "NEUROCIRUGIA"
-    },
-    {
-        name: "LETTY CHAVEZ",
-        speciality: "TRAUMATOLOGIA"
-    },
-    {
-        name: "LILIANA DE LA FUENTE",
-        speciality: "CIRUGIA GENERAL"
-    },
-    {
-        name: "MARIANA LOSSADA",
-        speciality: "ORL"
-    },
-    {
-        name: "MARISELA MENDEZ",
-        speciality: "OFTALMOLOGIA"
-    },
-    {
-        name: "MAYDA MARTINEZ",
-        speciality: "GINECOLOGIA"
-    },
-    {
-        name: "MERFRA PINERO",
-        speciality: "GINECOLOGIA"
-    },
-    {
-        name: "NACCY MORALES",
-        speciality: "ODONTOLOGIA"
-    },
-    {
-        name: "NATALIA MOTA",
-        speciality: "CIRUGIA GENERAL"
-    },
-    {
-        name: "NORIS MARTINEZ",
-        speciality: "GINECOLOGIA"
-    },
-    {
-        name: "PETER KNAPP",
-        speciality: "CIRUGIA GENERAL"
-    },
-    {
-        name: "RAFAEL CHAVERO",
-        speciality: "CARDIOLOGIA"
-    },
-    {
-        name: "RICCIARDELLI GAETANO",
-        speciality: "GINECOLOGIA"
-    },
-    {
-        name: "RUBEN SIFONTES",
-        speciality: "OFTALMOLOGIA"
-    },
-    {
-        name: "SANDRA PEREZ",
-        speciality: "CARDIOLOGIA"
-    },
-    {
-        name: "SUSANA SALAZAR",
-        speciality: "MEDICINA INTERNA"
-    },
-    {
-        name: "YASMIN ALFONZO",
-        speciality: "GASTROENTEROLOGIA"
-    },
-    {
-        name: "ZAIDA GARRIDO",
-        speciality: "CIRUGIA PLASTICA"
-    }
+specialty_names = [
+  'CIRUGIA PLASTICA', 'CIRUGIA GENERAL', 'ODONTOLOGIA', 'NEUROCIRUGIA',
+  'ORL', 'GINECOLOGIA', 'GASTROENTEROLOGIA', 'NEUMONOLOGIA',
+  'TRAUMATOLOGIA', 'INTENSIVISTA', 'UROLOGIA', 'MEDICINA INTERNA',
+  'OFTALMOLOGIA', 'CARDIOLOGIA'
+]
+
+specialties = {}
+specialty_names.each do |name|
+  specialties[name] = Specialty.create!(name: name, description: "Especialidad de #{name.downcase}")
+end
+
+medicos = [
+  { name: "ALBA AMUNDARAY",      specialty: "CIRUGIA PLASTICA" },
+  { name: "ALEXANDER MORALES",   specialty: "CIRUGIA GENERAL" },
+  { name: "ANIBAL ROJAS",        specialty: "ODONTOLOGIA" },
+  { name: "AURA CONTRERAS",      specialty: "NEUROCIRUGIA" },
+  { name: "CARLA GONZALEZ",      specialty: "ORL" },
+  { name: "CRUZ GARBAN",         specialty: "GINECOLOGIA" },
+  { name: "DAVID MAGO",          specialty: "GASTROENTEROLOGIA" },
+  { name: "EDGAR VALOA",         specialty: "NEUMONOLOGIA" },
+  { name: "EDUARDO BILBAO",      specialty: "TRAUMATOLOGIA" },
+  { name: "FRANKY TORRES",       specialty: "INTENSIVISTA" },
+  { name: "GERSON ZAMBRANO",     specialty: "INTENSIVISTA" },
+  { name: "GIANCARLO ROTUNNO",   specialty: "UROLOGIA" },
+  { name: "GLADYS MOTA",         specialty: "MEDICINA INTERNA" },
+  { name: "IGOR MARQUEZ",        specialty: "NEUROCIRUGIA" },
+  { name: "JENNY MARTINEZ",      specialty: "MEDICINA INTERNA" },
+  { name: "JHOSBELIS GARCIA",    specialty: "MEDICINA INTERNA" },
+  { name: "JOSE MEDINA",         specialty: "UROLOGIA" },
+  { name: "JOSE NEGRIN",         specialty: "TRAUMATOLOGIA" },
+  { name: "JOSE RAMON NOYA",     specialty: "CIRUGIA GENERAL" },
+  { name: "JOSE SANGUINO",       specialty: "NEUROCIRUGIA" },
+  { name: "LETTY CHAVEZ",        specialty: "TRAUMATOLOGIA" },
+  { name: "LILIANA DE LA FUENTE",specialty: "CIRUGIA GENERAL" },
+  { name: "MARIANA LOSSADA",     specialty: "ORL" },
+  { name: "MARISELA MENDEZ",     specialty: "OFTALMOLOGIA" },
+  { name: "MAYDA MARTINEZ",      specialty: "GINECOLOGIA" },
+  { name: "MERFRA PINERO",       specialty: "GINECOLOGIA" },
+  { name: "NACCY MORALES",       specialty: "ODONTOLOGIA" },
+  { name: "NATALIA MOTA",        specialty: "CIRUGIA GENERAL" },
+  { name: "NORIS MARTINEZ",      specialty: "GINECOLOGIA" },
+  { name: "PETER KNAPP",         specialty: "CIRUGIA GENERAL" },
+  { name: "RAFAEL CHAVERO",      specialty: "CARDIOLOGIA" },
+  { name: "RICCIARDELLI GAETANO",specialty: "GINECOLOGIA" },
+  { name: "RUBEN SIFONTES",      specialty: "OFTALMOLOGIA" },
+  { name: "SANDRA PEREZ",        specialty: "CARDIOLOGIA" },
+  { name: "SUSANA SALAZAR",      specialty: "MEDICINA INTERNA" },
+  { name: "YASMIN ALFONZO",      specialty: "GASTROENTEROLOGIA" },
+  { name: "ZAIDA GARRIDO",       specialty: "CIRUGIA PLASTICA" }
 ]
 
 adulto_area = Area.create!(name: 'Emergencia Adultos', room_type: 'adulto', description: 'Área de emergencia para pacientes adultos')
@@ -233,5 +140,5 @@ kids_rooms.each do |i|
 end
 
 medicos.each do |i|
-    Doctor.create(i)
+    Doctor.create!(name: i[:name], specialty: specialties[i[:specialty]])
 end

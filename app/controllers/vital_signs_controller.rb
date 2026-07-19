@@ -29,6 +29,6 @@ class VitalSignsController < ApplicationController
   end
 
   def vital_sign_params
-    params.permit(:systolic_bp, :diastolic_bp, :heart_rate, :respiratory_rate, :temperature, :oxygen_saturation, :glucose, :gcs_eye, :gcs_verbal, :gcs_motor, :pupil_left, :pupil_right, :pain_scale, :recorded_at)
+    params.permit(:systolic_bp, :diastolic_bp, :heart_rate, :respiratory_rate, :temperature, :oxygen_saturation, :glucose, :height, :weight, :bmi, :recorded_at)
   end
 end

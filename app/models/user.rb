@@ -54,6 +54,9 @@ class User < ApplicationRecord
     'hospitalizacion.view', 'hospitalizacion.edit', 'hospitalizacion.nursing',
     'quirofano.view', 'quirofano.schedule', 'quirofano.edit',
     'uci.view', 'uci.edit', 'uci.nursing',
+    'especialidades.view', 'especialidades.create', 'especialidades.edit', 'especialidades.delete',
+    'agenda.edit',
+    'citas.view', 'citas.create', 'citas.edit', 'citas.delete', 'citas.attend',
   ].freeze
 
   def effective_permissions

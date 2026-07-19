@@ -60,7 +60,8 @@ namespace :import_legacy_data do
 
     User.find_or_create_by!(email: 'admin@emerboard.com') do |u|
       u.username = 'admin'
-      u.password = SecureRandom.hex(16)
+      u.password = 'Admin123456!'
+      u.password_confirmation = 'Admin123456!'
       u.name = 'Admin'
       u.profile = profile
       u.status = 'active'
@@ -82,7 +83,16 @@ namespace :import_legacy_data do
       rooms.view
       notes.view notes.create notes.edit notes.delete
       emergencia.assign_room
+      especialidades.view especialidades.create especialidades.edit especialidades.delete
+      agenda.edit
+      citas.view citas.create citas.edit citas.delete citas.attend
     ]
+  end
+
+  def find_or_create_specialty(name)
+    Specialty.find_or_create_by!(name: name.upcase.strip) do |s|
+      s.description = "Especialidad de #{name.downcase.strip}"
+    end
   end
 
   def import_doctors!
@@ -102,8 +112,9 @@ namespace :import_legacy_data do
     patient_doctors.each do |name|
       next if existing.include?(name.upcase.strip)
 
-      speciality = doctor_names[name] || 'GENERAL'
-      Doctor.create!(name: name.strip, speciality: speciality, status: 'active')
+      speciality_name = doctor_names[name] || 'GENERAL'
+      specialty = find_or_create_specialty(speciality_name)
+      Doctor.create!(name: name.strip, specialty: specialty, status: 'active')
       created += 1
     end
 

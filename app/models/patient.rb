@@ -32,11 +32,16 @@ class Patient < ApplicationRecord
   def stats
     total_visits = emergencies.count
     last_visit = emergencies.order(ingress_date: :desc).first
+    surgeries_count = Hospitalization.joins(:emergency)
+                                     .where(emergencies: { patient_id: id })
+                                     .joins(:surgeries)
+                                     .count
     {
       total_visits: total_visits,
       last_visit_date: last_visit&.ingress_date,
       last_visit_status: last_visit&.status,
-      age: age
+      age: age,
+      surgeries: surgeries_count
     }
   end
 
