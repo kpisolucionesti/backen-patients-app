@@ -38,10 +38,13 @@ class User < ApplicationRecord
 
   ALL_PERMISSIONS = [
     'emergencia.view', 'emergencia.create', 'emergencia.edit',
-    'emergencia.triage', 'emergencia.discharge',
+    'emergencia.anular', 'emergencia.triage', 'emergencia.discharge',
+    'emergencia.assign_room', 'emergencia.cargar_laboratorios',
+    'emergencia.modificar_antecedentes',
     'historial.view', 'historial.export',
     'configuraciones.view',
     'pacientes.view', 'pacientes.edit',
+    'pacientes.cargar_laboratorios', 'pacientes.modificar_antecedentes',
     'medicos.view', 'medicos.create', 'medicos.edit', 'medicos.suspend',
     'usuarios.view', 'usuarios.create', 'usuarios.edit',
     'usuarios.suspend', 'usuarios.manage_permissions', 'usuarios.change_password',
@@ -49,7 +52,6 @@ class User < ApplicationRecord
     'areas.view', 'areas.create', 'areas.edit', 'areas.delete',
     'rooms.view', 'rooms.create', 'rooms.edit', 'rooms.delete',
     'notes.view', 'notes.create', 'notes.edit', 'notes.delete',
-    'emergencia.assign_room',
     'lab_params.view', 'lab_params.edit',
     'hospitalizacion.view', 'hospitalizacion.edit', 'hospitalizacion.nursing',
     'quirofano.view', 'quirofano.schedule', 'quirofano.edit',

@@ -29,6 +29,7 @@ module Quirofanos
             emergency_id: surgery.hospitalization&.emergency_id
           )
         end
+        update_hospitalization_status(surgery) if surgery.status == 'in_progress'
         render json: serialize_surgery(surgery), status: :created
       else
         render json: { error: surgery.errors.full_messages.join(', ') }, status: :unprocessable_entity
@@ -59,7 +60,8 @@ module Quirofanos
                     :preop_notes, :postop_notes, :result, :preanesthetic_evaluation,
                     :hospitalization_id, :area_id, :patient_id,
                     :scheduled_start_time, :scheduled_end_time,
-                    :anesthesiologist, :anesthesia_type)
+                    :actual_start_time, :actual_end_time,
+                    :anesthesiologist, :anesthesia_type, :ambulatory)
     end
 
     def serialize_surgery(surgery)
@@ -73,6 +75,8 @@ module Quirofanos
         surgery_date: surgery.surgery_date,
         scheduled_start_time: surgery.scheduled_start_time,
         scheduled_end_time: surgery.scheduled_end_time,
+        actual_start_time: surgery.actual_start_time,
+        actual_end_time: surgery.actual_end_time,
         status: surgery.status,
         preanesthetic_evaluation: surgery.preanesthetic_evaluation,
         preop_notes: surgery.preop_notes,
@@ -81,6 +85,7 @@ module Quirofanos
         area_id: surgery.area_id,
         anesthesiologist: surgery.anesthesiologist,
         anesthesia_type: surgery.anesthesia_type,
+        ambulatory: surgery.ambulatory?,
         patient: patient ? {
           id: patient.id,
           name: patient.name,
@@ -90,6 +95,12 @@ module Quirofanos
           age: patient.age
         } : nil
       }
+    end
+
+    def update_hospitalization_status(surgery)
+      hospitalization = surgery.hospitalization
+      return unless hospitalization
+      hospitalization.update(status: 'in_surgery') if hospitalization.status == 'active'
     end
   end
 end

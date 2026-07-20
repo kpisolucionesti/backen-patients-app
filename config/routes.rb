@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     end
     resources :allergies, controller: 'patient_allergies', only: [:index, :create, :update, :destroy]
     resources :antecedents, controller: 'patient_antecedents', only: [:index, :create, :update, :destroy]
+    resources :surgeries, only: [:index], controller: 'patient_surgeries'
   end
   resources :doctors do
     resource :schedules, only: [:show, :update], controller: 'doctor_schedules'
@@ -34,7 +35,7 @@ Rails.application.routes.draw do
 
   resource :direct_admission, only: [:create], controller: 'direct_admissions'
 
-  resources :hospitalizations, only: [] do
+  resources :hospitalizations, only: [:show] do
     collection do
       get :census
       get :historical

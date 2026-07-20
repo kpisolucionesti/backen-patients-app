@@ -6,9 +6,14 @@ class Surgery < ApplicationRecord
   has_many :surgery_team_members, dependent: :destroy
 
   validates :surgery_type, presence: true
-  validates :status, inclusion: { in: %w[scheduled completed cancelled] }
-  validates :preanesthetic_evaluation, presence: true, if: -> { status == 'scheduled' || status == 'completed' }
+  validates :status, inclusion: { in: %w[scheduled in_progress completed cancelled] }
+  validates :preanesthetic_evaluation, presence: true, if: -> { status == 'scheduled' || status == 'in_progress' || status == 'completed' }
 
   scope :scheduled, -> { where(status: 'scheduled') }
+  scope :in_progress, -> { where(status: 'in_progress') }
   scope :completed, -> { where(status: 'completed') }
+
+  def ambulatory?
+    hospitalization_id.nil? && patient_id.present?
+  end
 end

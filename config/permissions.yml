@@ -8,12 +8,18 @@ groups:
         label: Crear
       - key: emergencia.edit
         label: Editar
+      - key: emergencia.anular
+        label: Anular
       - key: emergencia.triage
         label: Asignar Triage
       - key: emergencia.discharge
         label: Dar de Alta
       - key: emergencia.assign_room
         label: Asignar Sala
+      - key: emergencia.cargar_laboratorios
+        label: Cargar Laboratorios
+      - key: emergencia.modificar_antecedentes
+        label: Modificar Antecedentes
 
   - section: Historial
     color: '#fff3e0'
@@ -36,6 +42,10 @@ groups:
         label: Ver
       - key: pacientes.edit
         label: Editar
+      - key: pacientes.cargar_laboratorios
+        label: Cargar Laboratorios
+      - key: pacientes.modificar_antecedentes
+        label: Modificar Antecedentes
 
   - section: Médicos
     color: '#f3e5f5'
@@ -77,11 +87,29 @@ groups:
       - key: perfiles.delete
         label: Eliminar
 
+  - section: Áreas
+    color: '#f5f5f5'
+    permissions:
+      - key: areas.view
+        label: Ver
+      - key: areas.create
+        label: Crear
+      - key: areas.edit
+        label: Editar
+      - key: areas.delete
+        label: Eliminar
+
   - section: Salas
     color: '#f5f5f5'
     permissions:
       - key: rooms.view
         label: Ver
+      - key: rooms.create
+        label: Crear
+      - key: rooms.edit
+        label: Editar
+      - key: rooms.delete
+        label: Eliminar
 
   - section: Notas
     color: '#e8eaf6'
@@ -124,3 +152,43 @@ groups:
         label: Editar
       - key: uci.nursing
         label: Enfermería
+
+  - section: Laboratorio
+    color: '#fff8e1'
+    permissions:
+      - key: lab_params.view
+        label: Ver
+      - key: lab_params.edit
+        label: Editar
+
+  - section: Especialidades
+    color: '#e8eaf6'
+    permissions:
+      - key: especialidades.view
+        label: Ver
+      - key: especialidades.create
+        label: Crear
+      - key: especialidades.edit
+        label: Editar
+      - key: especialidades.delete
+        label: Eliminar
+
+  - section: Agenda
+    color: '#fff3e0'
+    permissions:
+      - key: agenda.edit
+        label: Editar
+
+  - section: Citas
+    color: '#e3f2fd'
+    permissions:
+      - key: citas.view
+        label: Ver
+      - key: citas.create
+        label: Crear
+      - key: citas.edit
+        label: Editar
+      - key: citas.delete
+        label: Eliminar
+      - key: citas.attend
+        label: Atender

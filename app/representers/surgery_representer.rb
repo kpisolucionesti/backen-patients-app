@@ -13,11 +13,14 @@ class SurgeryRepresenter < Representable::Decorator
   property :patient_id
   property :scheduled_start_time
   property :scheduled_end_time
+  property :actual_start_time
+  property :actual_end_time
   property :anesthesiologist
   property :anesthesia_type
   property :preop_notes
   property :postop_notes
   property :result
+  property :ambulatory
   property :created_at
   property :updated_at
 

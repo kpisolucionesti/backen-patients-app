@@ -5,6 +5,7 @@ class SurgeriesController < ApplicationController
   def search
     authorize!('hospitalizacion.view')
     surgeries = Surgery.includes(hospitalization: { emergency: :patient })
+                       .includes(:patient)
                        .order(surgery_date: :desc)
 
     if params[:q].present?
@@ -13,7 +14,16 @@ class SurgeriesController < ApplicationController
       hospitalization_ids = Hospitalization.joins(:emergency)
                                             .where(emergencies: { patient_id: patient_ids })
                                             .pluck(:id)
-      surgeries = surgeries.where(hospitalization_id: hospitalization_ids)
+      surgeries = surgeries.where(
+        "surgeries.hospitalization_id IN (?) OR (surgeries.patient_id IN (?) AND surgeries.hospitalization_id IS NULL)",
+        hospitalization_ids, patient_ids
+      )
+    end
+
+    if params[:patient_id].present?
+      surgeries = surgeries.where(patient_id: params[:patient_id])
+                           .or(surgeries.where(hospitalization_id: Hospitalization.joins(:emergency)
+                             .where(emergencies: { patient_id: params[:patient_id] }).pluck(:id)))
     end
 
     if params[:from].present?
@@ -78,7 +88,8 @@ class SurgeriesController < ApplicationController
     params.permit(:surgery_type, :description, :surgeon_name, :surgery_date, :status,
                   :preop_notes, :postop_notes, :result, :preanesthetic_evaluation,
                   :area_id, :patient_id, :scheduled_start_time, :scheduled_end_time,
-                  :anesthesiologist, :anesthesia_type,
+                  :actual_start_time, :actual_end_time,
+                  :anesthesiologist, :anesthesia_type, :ambulatory,
                   team_members_attributes: [:id, :doctor_id, :role, :_destroy])
   end
 
@@ -93,6 +104,8 @@ class SurgeriesController < ApplicationController
       surgery_date: surgery.surgery_date,
       scheduled_start_time: surgery.scheduled_start_time,
       scheduled_end_time: surgery.scheduled_end_time,
+      actual_start_time: surgery.actual_start_time,
+      actual_end_time: surgery.actual_end_time,
       status: surgery.status,
       preanesthetic_evaluation: surgery.preanesthetic_evaluation,
       preop_notes: surgery.preop_notes,
@@ -101,6 +114,7 @@ class SurgeriesController < ApplicationController
       area_id: surgery.area_id,
       anesthesiologist: surgery.anesthesiologist,
       anesthesia_type: surgery.anesthesia_type,
+      ambulatory: surgery.ambulatory?,
       patient: patient ? {
         id: patient.id,
         name: patient.name,

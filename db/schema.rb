@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_08_09_000000) do
+ActiveRecord::Schema[7.0].define(version: 2026_08_10_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -472,6 +472,9 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_09_000000) do
     t.datetime "scheduled_end_time"
     t.string "anesthesiologist"
     t.string "anesthesia_type"
+    t.datetime "actual_start_time"
+    t.datetime "actual_end_time"
+    t.boolean "ambulatory", default: false
     t.index ["area_id"], name: "index_surgeries_on_area_id"
     t.index ["hospitalization_id"], name: "index_surgeries_on_hospitalization_id"
     t.index ["patient_id"], name: "index_surgeries_on_patient_id"

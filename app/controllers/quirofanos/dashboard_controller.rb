@@ -47,6 +47,8 @@ module Quirofanos
         surgery_date: surgery.surgery_date,
         scheduled_start_time: surgery.scheduled_start_time,
         scheduled_end_time: surgery.scheduled_end_time,
+        actual_start_time: surgery.actual_start_time,
+        actual_end_time: surgery.actual_end_time,
         status: surgery.status,
         anesthesiologist: surgery.anesthesiologist,
         anesthesia_type: surgery.anesthesia_type,
@@ -54,6 +56,7 @@ module Quirofanos
         preop_notes: surgery.preop_notes,
         postop_notes: surgery.postop_notes,
         result: surgery.result,
+        ambulatory: surgery.ambulatory?,
         area: surgery.area ? { id: surgery.area.id, name: surgery.area.name } : nil,
         team_members: surgery.surgery_team_members.map { |m|
           {

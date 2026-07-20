@@ -7,7 +7,9 @@ class HospitalizationsController < ApplicationController
                                       .includes(emergency: [:patient, :doctors])
                                       .order(discharge_date: :desc)
 
-    if params[:q].present?
+    if params[:patient_id].present?
+      hospitalizations = hospitalizations.where(emergencies: { patient_id: params[:patient_id] })
+    elsif params[:q].present?
       q = "%#{params[:q]}%"
       patient_ids = Patient.where("name ILIKE ? OR lastname ILIKE ? OR ci ILIKE ?", q, q, q).pluck(:id)
       hospitalizations = hospitalizations.where(emergencies: { patient_id: patient_ids })
@@ -26,7 +28,11 @@ class HospitalizationsController < ApplicationController
 
   def show
     authorize!('hospitalizacion.view')
-    hospitalization = Hospitalization.find_by!(emergency_id: params[:emergency_id])
+    hospitalization = if params[:emergency_id]
+      Hospitalization.find_by!(emergency_id: params[:emergency_id])
+    else
+      Hospitalization.find(params[:id])
+    end
     render json: ::HospitalizationRepresenter.new(hospitalization), status: :ok
   end
 
@@ -83,6 +89,8 @@ class HospitalizationsController < ApplicationController
       discharge_summary: params[:discharge_summary],
       discharge_diagnosis: params[:discharge_diagnosis]
     )
+      hospitalization.emergency.update!(status: 2) if hospitalization.emergency.status == 3
+
       patient = hospitalization.emergency&.patient
       if patient
         Notification.create!(

@@ -3,12 +3,14 @@ class Patient < ApplicationRecord
   has_many :notes, dependent: :destroy
   has_many :allergies, class_name: 'PatientAllergy', dependent: :destroy
   has_many :antecedents, class_name: 'PatientAntecedent', dependent: :destroy
+  has_many :appointments, dependent: :destroy
 
   scope :active, -> { where(disabled: [nil, false]) }
 
   def disabled?
     disabled == true
   end
+  has_many :surgeries, dependent: :destroy
   belongs_to :created_by, class_name: 'User', optional: true
 
   validates :ci, uniqueness: true
@@ -33,16 +35,23 @@ class Patient < ApplicationRecord
   def stats
     total_visits = emergencies.count
     last_visit = emergencies.order(ingress_date: :desc).first
-    surgeries_count = Hospitalization.joins(:emergency)
-                                     .where(emergencies: { patient_id: id })
-                                     .joins(:surgeries)
-                                     .count
+    hospitalized_surgeries_count = Hospitalization.joins(:emergency)
+                                                   .where(emergencies: { patient_id: id })
+                                                   .joins(:surgeries)
+                                                   .count
+    ambulatory_surgeries_count = surgeries.where(hospitalization_id: nil).count
+    surgeries_count = hospitalized_surgeries_count + ambulatory_surgeries_count
+    hospitalizations_count = Hospitalization.joins(:emergency)
+                                            .where(emergencies: { patient_id: id })
+                                            .count
     {
       total_visits: total_visits,
       last_visit_date: last_visit&.ingress_date,
       last_visit_status: last_visit&.status,
       age: age,
-      surgeries: surgeries_count
+      surgeries: surgeries_count,
+      hospitalizations: hospitalizations_count,
+      appointments: appointments.count
     }
   end
 
