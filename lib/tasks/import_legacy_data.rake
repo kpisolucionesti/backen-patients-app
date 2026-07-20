@@ -140,6 +140,7 @@ namespace :import_legacy_data do
       lastname = rest.empty? ? nil : rest.join(' ')
 
       attrs = {
+        medical_history_number: "MH-#{Time.current.year}-#{old.id.to_s.rjust(5, '0')}",
         name: first_name || '',
         lastname: lastname,
         gender: old.gender,
@@ -177,8 +178,9 @@ namespace :import_legacy_data do
       end
 
       ingress = parse_ingress_date(old.ingress_date)
-      egress = old.medical_exit.present? && old.medical_exit != '\\N' ? old.updated_at : nil
-      status = old.status.presence&.to_i || 1
+      # All imported data is historical — mark as discharged (ALTA)
+      status = 2
+      egress = old.updated_at
 
       begin
         Emergency.create!(

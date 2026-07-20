@@ -3,8 +3,9 @@ class LabParameterGroupsController < ApplicationController
   before_action :authorize_lab_params
 
   def index
-    groups = LabParameterGroup.includes(:lab_parameters).order(name: :asc)
-    render json: groups.as_json(include: { lab_parameters: { only: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order] } }), status: :ok
+    scope = params[:include_inactive] == 'true' ? LabParameterGroup.all : LabParameterGroup.active
+    groups = scope.includes(:lab_parameters).order(name: :asc)
+    render json: groups.as_json(include: { lab_parameters: { only: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :is_active] } }), status: :ok
   end
 
   def create
@@ -37,19 +38,31 @@ class LabParameterGroupsController < ApplicationController
 
   def destroy
     group = LabParameterGroup.find(params[:id])
+    group.lab_parameters.update_all(is_active: false)
+    group.update!(is_active: false)
     UserActivityLog.create!(
       user: @current_user,
-      action: 'delete_lab_parameter_group',
-      description: "Eliminó grupo de parámetros '#{group.name}'"
+      action: 'suspend_lab_parameter_group',
+      description: "Suspendió grupo de parámetros '#{group.name}'"
     )
-    group.destroy!
     head :no_content
+  end
+
+  def restore
+    group = LabParameterGroup.find(params[:id])
+    group.update!(is_active: true)
+    UserActivityLog.create!(
+      user: @current_user,
+      action: 'restore_lab_parameter_group',
+      description: "Restauró grupo de parámetros '#{group.name}'"
+    )
+    render json: group.as_json(include: { lab_parameters: { only: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :is_active] } }), status: :ok
   end
 
   private
 
   def group_params
-    params.permit(:name, :description, lab_parameters_attributes: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :_destroy])
+    params.permit(:name, :description, :is_active, lab_parameters_attributes: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :_destroy, :is_active])
   end
 
   def authorize_lab_params

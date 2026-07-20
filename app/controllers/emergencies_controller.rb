@@ -64,6 +64,12 @@ class EmergenciesController < ApplicationController
             render json: { error: 'El paciente ya tiene una emergencia activa. Debe cerrarla antes de crear una nueva.' }, status: :unprocessable_entity
             return
         end
+        if params[:patient_id].present? && Emergency.joins(:hospitalization)
+                                                     .where(emergencies: { patient_id: params[:patient_id] })
+                                                     .where(hospitalizations: { status: 'active' }).exists?
+            render json: { error: 'El paciente tiene una hospitalización activa. No puede tener una emergencia activa simultáneamente.' }, status: :unprocessable_entity
+            return
+        end
         ActiveRecord::Base.transaction do
             emergency = Emergency.new(emergency_params)
             emergency.created_by = @current_user
@@ -80,6 +86,16 @@ class EmergenciesController < ApplicationController
     def update
         authorize!('emergencia.edit')
         ActiveRecord::Base.transaction do
+            if params[:status].present? && params[:status].to_i == 3
+                patient_id = @emergency.patient_id
+                if Emergency.joins(:hospitalization)
+                            .where(emergencies: { patient_id: patient_id })
+                            .where.not(emergencies: { id: @emergency.id })
+                            .where(hospitalizations: { status: 'active' }).exists?
+                    render json: { error: 'El paciente tiene una hospitalización activa. No puede cambiar a estado Ingresado.' }, status: :unprocessable_entity
+                    return
+                end
+            end
             update_params = emergency_params
             if [2, 3, 4, 5].include?(update_params[:status].to_i) && !@emergency.egress_at && !params[:egress_at]
                 update_params = update_params.merge(egress_at: Time.current)
@@ -92,6 +108,24 @@ class EmergenciesController < ApplicationController
             if status_changed
                 status_labels = { 1 => 'Atendido', 2 => 'Alta', 3 => 'Ingresado', 4 => 'Anulada', 5 => 'Fallecido' }
                 UserActivityLog.create!(user: @current_user, action: 'update_emergency_status', description: "Cambió estado de emergencia ##{@emergency.id} de '#{status_labels[old_status]}' a '#{status_labels[@emergency.status]}' del paciente #{patient.name} #{patient.lastname} (CI: #{patient.ci})")
+
+                if @emergency.status == 2
+                    Notification.create!(
+                        notification_type: 'emergency_discharge',
+                        title: "Alta Médica — #{patient.name} #{patient.lastname}",
+                        message: "#{patient.name} #{patient.lastname} recibió alta médica",
+                        link: '/patients/atencion?tab=portal',
+                        emergency_id: @emergency.id
+                    )
+                elsif @emergency.status == 3 && @emergency.transfer == 'Hospitalizacion'
+                    Notification.create!(
+                        notification_type: 'hospitalization_admission',
+                        title: "Ingreso a Hospitalización — #{patient.name} #{patient.lastname}",
+                        message: "#{patient.name} #{patient.lastname} fue ingresado a hospitalización",
+                        link: '/patients/atencion?tab=hospitalizacion',
+                        emergency_id: @emergency.id
+                    )
+                end
             else
                 UserActivityLog.create!(user: @current_user, action: 'update_emergency', description: "Editó emergencia ##{@emergency.id} del paciente #{patient.name} #{patient.lastname} (CI: #{patient.ci})")
             end

@@ -4,6 +4,7 @@ EmergencyDoctor.destroy_all
 Emergency.destroy_all
 Note.destroy_all
 Patient.destroy_all
+Area.destroy_all
 Room.destroy_all
 Doctor.destroy_all
 Specialty.destroy_all
@@ -26,6 +27,7 @@ admin_permissions = [
   'especialidades.view', 'especialidades.create', 'especialidades.edit', 'especialidades.delete',
   'agenda.edit',
   'citas.view', 'citas.create', 'citas.edit', 'citas.delete', 'citas.attend',
+  'quirofano.view', 'quirofano.edit',
 ]
 
 Profile.create!(
@@ -130,6 +132,9 @@ medicos = [
 
 adulto_area = Area.create!(name: 'Emergencia Adultos', room_type: 'adulto', description: 'Área de emergencia para pacientes adultos')
 kids_area  = Area.create!(name: 'Emergencia Pediatría', room_type: 'pediatria', description: 'Área de emergencia para pacientes pediátricos')
+quirofano1 = Area.create!(name: 'Quirófano 1', room_type: 'quirofano', description: 'Quirófano principal')
+quirofano2 = Area.create!(name: 'Quirófano 2', room_type: 'quirofano', description: 'Quirófano secundario')
+quirofano3 = Area.create!(name: 'Quirófano 3', room_type: 'quirofano', description: 'Quirófano de emergencias')
 
 adulto_rooms.each do |i|
     Room.create(name: i, area: adulto_area)

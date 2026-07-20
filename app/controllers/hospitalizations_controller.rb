@@ -16,7 +16,7 @@ class HospitalizationsController < ApplicationController
     total = hospitalizations.count
     page = (params[:page] || 1).to_i
     per_page = (params[:per_page] || 50).to_i
-    hospitalizations = hospitalizations.page(page).per(per_page)
+    hospitalizations = hospitalizations.limit(per_page).offset((page - 1) * per_page)
 
     render json: {
       data: ::HospitalizationRepresenter.for_collection.new(hospitalizations),
@@ -83,6 +83,16 @@ class HospitalizationsController < ApplicationController
       discharge_summary: params[:discharge_summary],
       discharge_diagnosis: params[:discharge_diagnosis]
     )
+      patient = hospitalization.emergency&.patient
+      if patient
+        Notification.create!(
+          notification_type: 'hospitalization_discharge',
+          title: "Alta de Hospitalización — #{patient.name} #{patient.lastname}",
+          message: "#{patient.name} #{patient.lastname} fue dado de alta de hospitalización",
+          link: '/patients/atencion?tab=historial',
+          emergency_id: hospitalization.emergency_id
+        )
+      end
       render json: ::HospitalizationRepresenter.new(hospitalization), status: :ok
     else
       render json: { error: hospitalization.errors.full_messages.join(', ') }, status: :unprocessable_entity
@@ -92,23 +102,29 @@ class HospitalizationsController < ApplicationController
   def census
     authorize!('hospitalizacion.view')
 
+    recent_cutoff = 7.days.ago
     Emergency.where(status: 3, transfer: 'Hospitalizacion')
              .where.not(id: Hospitalization.select(:emergency_id))
-             .find_each do |emergency|
+             .where("ingress_date >= ? OR created_at >= ?", recent_cutoff, recent_cutoff)
+             .limit(100)
+             .each do |emergency|
       hospitalization = emergency.build_hospitalization(
-        admission_date: emergency.egress_at || emergency.created_at || Time.current,
+        admission_date: Time.current,
         admission_diagnosis: emergency.diagnostic,
         status: 'active'
       )
       hospitalization.save(validate: false) rescue nil
     end
 
+    page = (params[:page] || 1).to_i
+    per_page = (params[:per_page] || 50).to_i
     hospitalizations = Hospitalization.active.includes(emergency: [:patient, :doctors, :vital_signs])
                                      .order(admission_date: :desc)
+                                     .limit(per_page).offset((page - 1) * per_page)
 
     render json: {
       data: ::HospitalizationRepresenter.for_collection.new(hospitalizations),
-      total: hospitalizations.size
+      total: Hospitalization.active.count
     }, status: :ok
   end
 

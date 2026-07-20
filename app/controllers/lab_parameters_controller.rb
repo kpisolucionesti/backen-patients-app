@@ -3,9 +3,10 @@ class LabParametersController < ApplicationController
   before_action :authorize_lab_params
 
   def index
-    params = LabParameter.ordered.includes(:lab_parameter_group)
+    scope = params[:include_inactive] == 'true' ? LabParameter.ordered : LabParameter.active.ordered
+    params = scope.includes(:lab_parameter_group)
     render json: params.as_json(
-      only: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id, :created_at, :updated_at],
+      only: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id, :is_active, :created_at, :updated_at],
       include: { lab_parameter_group: { only: [:id, :name] } }
     ), status: :ok
   end
@@ -46,20 +47,35 @@ class LabParametersController < ApplicationController
 
   def destroy
     param = LabParameter.find(params[:id])
+    param.update!(is_active: false)
     UserActivityLog.create!(
       user: @current_user,
-      action: 'delete_lab_parameter',
-      description: "Eliminó parámetro de laboratorio '#{param.name}'"
+      action: 'suspend_lab_parameter',
+      description: "Suspendió parámetro de laboratorio '#{param.name}'"
     )
-    param.destroy!
     head :no_content
+  end
+
+  def restore
+    param = LabParameter.find(params[:id])
+    param.update!(is_active: true)
+    UserActivityLog.create!(
+      user: @current_user,
+      action: 'restore_lab_parameter',
+      description: "Restauró parámetro de laboratorio '#{param.name}'"
+    )
+    render json: param.as_json(
+      only: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id, :is_active, :created_at, :updated_at],
+      include: { lab_parameter_group: { only: [:id, :name] } }
+    ), status: :ok
   end
 
   def import
     data = params[:data]
     return render json: { error: 'No data provided' }, status: :unprocessable_entity unless data.is_a?(Array)
 
-    created = []
+    created = 0
+    updated = 0
     errors = []
 
     data.each_with_index do |item, idx|
@@ -80,17 +96,22 @@ class LabParametersController < ApplicationController
         reference_ranges = parse_legacy_reference_range(item[:reference_range] || item[:ref])
       end
 
-      param = LabParameter.new(
+      param = LabParameter.find_or_initialize_by(name: item[:parameter_name] || item[:name])
+      param.assign_attributes(
         lab_parameter_group: group,
-        name: item[:parameter_name] || item[:name],
         unit: item[:unit],
         abbreviation: item[:abbreviation],
         reference_ranges: reference_ranges || {},
-        sort_order: idx
+        sort_order: idx,
+        is_active: true
       )
 
       if param.save
-        created << param
+        if param.previous_changes.key?('id')
+          created += 1
+        else
+          updated += 1
+        end
       else
         errors << { row: idx + 1, error: param.errors.full_messages.join(', ') }
       end
@@ -99,15 +120,15 @@ class LabParametersController < ApplicationController
     UserActivityLog.create!(
       user: @current_user,
       action: 'import_lab_parameters',
-      description: "Importó #{created.size} parámetros de laboratorio desde Excel"
+      description: "Importó #{created} nuevos y actualizó #{updated} parámetros de laboratorio desde Excel"
     )
-    render json: { created: created.size, errors: errors }, status: :ok
+    render json: { created: created, updated: updated, errors: errors }, status: :ok
   end
 
   private
 
   def param_params
-    params.permit(:name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id)
+    params.permit(:name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id, :is_active)
   end
 
   def parse_legacy_reference_range(str)

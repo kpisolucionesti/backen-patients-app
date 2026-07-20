@@ -27,7 +27,7 @@ class SurgeriesController < ApplicationController
     total = surgeries.count
     page = (params[:page] || 1).to_i
     per_page = (params[:per_page] || 50).to_i
-    surgeries = surgeries.page(page).per(per_page)
+    surgeries = surgeries.limit(per_page).offset((page - 1) * per_page)
 
     render json: {
       data: surgeries.map { |s| serialize_surgery(s) },
@@ -75,11 +75,15 @@ class SurgeriesController < ApplicationController
   end
 
   def surgery_params
-    params.permit(:surgery_type, :description, :surgeon_name, :surgery_date, :status, :preop_notes, :postop_notes, :result)
+    params.permit(:surgery_type, :description, :surgeon_name, :surgery_date, :status,
+                  :preop_notes, :postop_notes, :result, :preanesthetic_evaluation,
+                  :area_id, :patient_id, :scheduled_start_time, :scheduled_end_time,
+                  :anesthesiologist, :anesthesia_type,
+                  team_members_attributes: [:id, :doctor_id, :role, :_destroy])
   end
 
   def serialize_surgery(surgery)
-    patient = surgery.hospitalization&.emergency&.patient
+    patient = surgery.patient || surgery.hospitalization&.emergency&.patient
     {
       id: surgery.id,
       hospitalization_id: surgery.hospitalization_id,
@@ -87,8 +91,16 @@ class SurgeriesController < ApplicationController
       description: surgery.description,
       surgeon_name: surgery.surgeon_name,
       surgery_date: surgery.surgery_date,
+      scheduled_start_time: surgery.scheduled_start_time,
+      scheduled_end_time: surgery.scheduled_end_time,
       status: surgery.status,
+      preanesthetic_evaluation: surgery.preanesthetic_evaluation,
+      preop_notes: surgery.preop_notes,
+      postop_notes: surgery.postop_notes,
       result: surgery.result,
+      area_id: surgery.area_id,
+      anesthesiologist: surgery.anesthesiologist,
+      anesthesia_type: surgery.anesthesia_type,
       patient: patient ? {
         id: patient.id,
         name: patient.name,

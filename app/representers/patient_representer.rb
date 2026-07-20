@@ -7,6 +7,7 @@ class PatientRepresenter < Representable::Decorator
     property :age
     property :birthday
     property :gender
+    property :medical_history_number
     property :representante
     property :representante_ci
     property :last_visit_date

@@ -12,6 +12,7 @@ class Patient < ApplicationRecord
   belongs_to :created_by, class_name: 'User', optional: true
 
   validates :ci, uniqueness: true
+  validates :medical_history_number, presence: true, uniqueness: true
 
   before_save :normalize_ci
 

@@ -6,4 +6,5 @@ class LabParameter < ApplicationRecord
   serialize :reference_ranges, coder: JSON
 
   scope :ordered, -> { order(sort_order: :asc, name: :asc) }
+  scope :active, -> { where(is_active: true) }
 end

@@ -11,6 +11,12 @@ class DirectAdmissionsController < ApplicationController
         render json: { error: 'El paciente ya tiene una emergencia activa' }, status: :unprocessable_entity
         return
       end
+      if Emergency.joins(:hospitalization)
+                  .where(emergencies: { patient_id: patient.id })
+                  .where(hospitalizations: { status: 'active' }).exists?
+        render json: { error: 'El paciente ya tiene una hospitalización activa' }, status: :unprocessable_entity
+        return
+      end
 
       emergency = Emergency.new(
         patient: patient,
@@ -82,6 +88,7 @@ class DirectAdmissionsController < ApplicationController
         lastname: params[:patient][:lastname],
         gender: params[:patient][:gender],
         birthday: params[:patient][:birthday],
+        medical_history_number: params[:patient][:medical_history_number] || params[:patient][:ci],
         created_by: @current_user
       )
     else

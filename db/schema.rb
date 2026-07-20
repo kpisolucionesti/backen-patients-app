@@ -10,9 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_08_07_000000) do
+ActiveRecord::Schema[7.0].define(version: 2026_08_09_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "appointment_displays", force: :cascade do |t|
     t.string "name", null: false
@@ -95,6 +123,18 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_07_000000) do
     t.string "phone"
     t.bigint "specialty_id"
     t.index ["specialty_id"], name: "index_doctors_on_specialty_id"
+  end
+
+  create_table "documents", force: :cascade do |t|
+    t.string "attachable_type", null: false
+    t.bigint "attachable_id", null: false
+    t.string "description"
+    t.string "file_type"
+    t.bigint "uploaded_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["attachable_type", "attachable_id"], name: "idx_documents_on_attachable"
+    t.index ["uploaded_by_id"], name: "index_documents_on_uploaded_by_id"
   end
 
   create_table "email_settings", force: :cascade do |t|
@@ -219,6 +259,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_07_000000) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "is_active", default: true, null: false
   end
 
   create_table "lab_parameters", force: :cascade do |t|
@@ -230,6 +271,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_07_000000) do
     t.datetime "updated_at", null: false
     t.string "abbreviation"
     t.jsonb "reference_ranges", default: {}
+    t.boolean "is_active", default: true, null: false
     t.index ["lab_parameter_group_id"], name: "index_lab_parameters_on_lab_parameter_group_id"
   end
 
@@ -302,6 +344,19 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_07_000000) do
     t.index ["emergency_id"], name: "index_notes_on_emergency_id"
   end
 
+  create_table "notifications", force: :cascade do |t|
+    t.string "notification_type", null: false
+    t.string "title", null: false
+    t.text "message"
+    t.string "link"
+    t.bigint "emergency_id"
+    t.boolean "read", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_notifications_on_created_at"
+    t.index ["read"], name: "index_notifications_on_read"
+  end
+
   create_table "paraclinical_studies", force: :cascade do |t|
     t.bigint "emergency_id", null: false
     t.string "study_type", null: false
@@ -346,9 +401,11 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_07_000000) do
     t.string "representante_ci"
     t.bigint "created_by_id"
     t.boolean "disabled", default: false
+    t.string "medical_history_number", null: false
     t.index ["ci"], name: "index_patients_on_ci", unique: true
     t.index ["created_by_id"], name: "index_patients_on_created_by_id"
     t.index ["lastname"], name: "index_patients_on_lastname"
+    t.index ["medical_history_number"], name: "index_patients_on_medical_history_number", unique: true
     t.index ["name"], name: "index_patients_on_name"
   end
 
@@ -397,7 +454,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_07_000000) do
   end
 
   create_table "surgeries", force: :cascade do |t|
-    t.bigint "hospitalization_id", null: false
+    t.bigint "hospitalization_id"
     t.string "surgery_type"
     t.text "description"
     t.string "surgeon_name"
@@ -408,7 +465,27 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_07_000000) do
     t.text "result"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "preanesthetic_evaluation"
+    t.bigint "area_id"
+    t.bigint "patient_id"
+    t.datetime "scheduled_start_time"
+    t.datetime "scheduled_end_time"
+    t.string "anesthesiologist"
+    t.string "anesthesia_type"
+    t.index ["area_id"], name: "index_surgeries_on_area_id"
     t.index ["hospitalization_id"], name: "index_surgeries_on_hospitalization_id"
+    t.index ["patient_id"], name: "index_surgeries_on_patient_id"
+  end
+
+  create_table "surgery_team_members", force: :cascade do |t|
+    t.bigint "surgery_id", null: false
+    t.bigint "doctor_id", null: false
+    t.string "role", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["doctor_id"], name: "index_surgery_team_members_on_doctor_id"
+    t.index ["surgery_id", "doctor_id", "role"], name: "idx_surgery_team_members_unique", unique: true
+    t.index ["surgery_id"], name: "index_surgery_team_members_on_surgery_id"
   end
 
   create_table "tv_screen_events", force: :cascade do |t|
@@ -505,6 +582,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_07_000000) do
     t.index ["recorded_by_id"], name: "index_vital_signs_on_recorded_by_id"
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "appointment_displays", "specialties"
   add_foreign_key "appointment_records", "appointments"
   add_foreign_key "appointment_records", "users", column: "created_by_id"
@@ -514,6 +593,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_07_000000) do
   add_foreign_key "appointments", "users", column: "created_by_id"
   add_foreign_key "doctor_schedules", "doctors"
   add_foreign_key "doctors", "specialties"
+  add_foreign_key "documents", "users", column: "uploaded_by_id"
   add_foreign_key "emergencies", "patients"
   add_foreign_key "emergencies", "users", column: "created_by_id"
   add_foreign_key "emergency_doctors", "doctors"
@@ -547,6 +627,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_07_000000) do
   add_foreign_key "physical_exams", "emergencies"
   add_foreign_key "rooms", "areas"
   add_foreign_key "surgeries", "hospitalizations"
+  add_foreign_key "surgery_team_members", "doctors"
+  add_foreign_key "surgery_team_members", "surgeries"
   add_foreign_key "tv_screen_events", "tv_screens"
   add_foreign_key "tv_screen_sessions", "tv_screens"
   add_foreign_key "user_activity_logs", "users"

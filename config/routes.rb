@@ -48,10 +48,20 @@ Rails.application.routes.draw do
     resources :medication_administrations, only: [:index, :create, :update, :destroy]
     resources :surgeries, only: [:index, :create, :update, :destroy]
   end
-  resources :surgeries, only: [] do
+  resources :surgeries, only: [:index, :show] do
     collection do
       get :search
     end
+  end
+
+  resources :surgery_team_members, only: [:create, :destroy]
+
+  resources :documents, only: [:index, :create, :destroy]
+
+  namespace :quirofanos do
+    get :schedule, to: 'dashboard#schedule'
+    get :weekly, to: 'dashboard#weekly'
+    resources :surgeries, only: [:index, :create, :update, :destroy], controller: 'surgeries'
   end
   resources :profiles do
     member do
@@ -86,8 +96,15 @@ Rails.application.routes.draw do
     collection do
       post :import
     end
+    member do
+      put :restore
+    end
   end
-  resources :lab_parameter_groups, only: [:index, :create, :update, :destroy]
+  resources :lab_parameter_groups, only: [:index, :create, :update, :destroy] do
+    member do
+      put :restore
+    end
+  end
 
   resources :permissions, only: [:index]
 
@@ -119,6 +136,15 @@ Rails.application.routes.draw do
         put "reset_password",   to: "passwords#update"
         post "keep_alive", to: "sessions#keep_alive"
       end
+    end
+  end
+
+  resources :notifications, only: [:index] do
+    member do
+      put :mark_read
+    end
+    collection do
+      put :mark_all_read
     end
   end
 end

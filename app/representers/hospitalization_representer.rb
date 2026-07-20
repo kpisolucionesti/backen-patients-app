@@ -53,4 +53,6 @@ class HospitalizationRepresenter < Representable::Decorator
       property :age
     end
   end
+
+  collection :surgeries, decorator: SurgeryRepresenter, class: Surgery
 end
