@@ -16,6 +16,7 @@ admin_permissions = [
   'emergencia.anular', 'emergencia.triage', 'emergencia.discharge',
   'emergencia.assign_room', 'emergencia.cargar_laboratorios',
   'emergencia.modificar_antecedentes',
+  'emergencia.generar_informe',
   'historial.view', 'historial.export',
   'configuraciones.view',
   'pacientes.view', 'pacientes.edit',

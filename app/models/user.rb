@@ -7,6 +7,7 @@ class User < ApplicationRecord
          authentication_keys: [:username]
 
   belongs_to :profile, optional: true
+  belongs_to :doctor, optional: true
   has_many :emergencies, foreign_key: 'created_by_id'
 
   validates :username, presence: true, uniqueness: { case_sensitive: false }
@@ -40,7 +41,7 @@ class User < ApplicationRecord
     'emergencia.view', 'emergencia.create', 'emergencia.edit',
     'emergencia.anular', 'emergencia.triage', 'emergencia.discharge',
     'emergencia.assign_room', 'emergencia.cargar_laboratorios',
-    'emergencia.modificar_antecedentes',
+    'emergencia.modificar_antecedentes', 'emergencia.generar_informe',
     'historial.view', 'historial.export',
     'configuraciones.view',
     'pacientes.view', 'pacientes.edit',

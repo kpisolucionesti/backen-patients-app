@@ -33,6 +33,6 @@ class DocumentsController < ApplicationController
   private
 
   def document_params
-    params.permit(:attachable_type, :attachable_id, :description, :file_type, :file)
+    params.permit(:attachable_type, :attachable_id, :description, :file_type, :report_type, :file)
   end
 end

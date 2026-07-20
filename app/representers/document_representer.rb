@@ -6,6 +6,7 @@ class DocumentRepresenter < Representable::Decorator
   property :attachable_id
   property :description
   property :file_type
+  property :report_type
   property :file_url
   property :file_name
   property :file_size

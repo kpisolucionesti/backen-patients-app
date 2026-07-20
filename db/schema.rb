@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_08_10_000000) do
+ActiveRecord::Schema[7.0].define(version: 2026_08_10_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -133,6 +133,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_10_000000) do
     t.bigint "uploaded_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "report_type"
     t.index ["attachable_type", "attachable_id"], name: "idx_documents_on_attachable"
     t.index ["uploaded_by_id"], name: "index_documents_on_uploaded_by_id"
   end
@@ -557,8 +558,10 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_10_000000) do
     t.boolean "must_change_password", default: true
     t.datetime "last_sign_in_at"
     t.datetime "last_sign_out_at"
+    t.bigint "doctor_id"
     t.index ["authentication_token"], name: "index_users_on_authentication_token", unique: true
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
+    t.index ["doctor_id"], name: "index_users_on_doctor_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["profile_id"], name: "index_users_on_profile_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -635,6 +638,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_10_000000) do
   add_foreign_key "tv_screen_events", "tv_screens"
   add_foreign_key "tv_screen_sessions", "tv_screens"
   add_foreign_key "user_activity_logs", "users"
+  add_foreign_key "users", "doctors"
   add_foreign_key "users", "profiles"
   add_foreign_key "vital_signs", "emergencies"
   add_foreign_key "vital_signs", "users", column: "recorded_by_id"

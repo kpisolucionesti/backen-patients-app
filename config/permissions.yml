@@ -20,6 +20,8 @@ groups:
         label: Cargar Laboratorios
       - key: emergencia.modificar_antecedentes
         label: Modificar Antecedentes
+      - key: emergencia.generar_informe
+        label: Generar Informe
 
   - section: Historial
     color: '#fff3e0'

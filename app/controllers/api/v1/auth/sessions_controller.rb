@@ -78,6 +78,7 @@ module Api
             name: user.name,
             lastname: user.lastname,
             profile_id: user.profile_id,
+            doctor_id: user.doctor_id,
             permissions: user.effective_permissions,
             is_admin: user.admin?,
             must_change_password: user.must_change_password,

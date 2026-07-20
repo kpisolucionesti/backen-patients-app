@@ -104,11 +104,11 @@ class UsersController < ApplicationController
     private
 
     def user_params
-        params.permit(:username, :name, :lastname, :email, :password, :password_confirmation, :status, :profile_id)
+        params.permit(:username, :name, :lastname, :email, :password, :password_confirmation, :status, :profile_id, :doctor_id)
     end
 
     def update_params
-        params.permit(:username, :name, :lastname, :email, :status, :profile_id)
+        params.permit(:username, :name, :lastname, :email, :status, :profile_id, :doctor_id)
     end
 
     def set_user
@@ -125,6 +125,7 @@ class UsersController < ApplicationController
             status: user.status,
             profile_id: user.profile_id,
             profile_name: user.profile&.name,
+            doctor_id: user.doctor_id,
             permissions: user.effective_permissions,
             is_admin: user.admin?,
             confirmed: user.confirmed?,
