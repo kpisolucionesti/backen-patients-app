@@ -10,7 +10,7 @@ class Document < ApplicationRecord
   validates :report_type, inclusion: { in: REPORT_TYPES }, allow_blank: true
 
   def file_url
-    rails_blob_url(file, disposition: 'inline', host: ENV.fetch('HOST', 'http://localhost:3100')) if file.attached?
+    Rails.application.routes.url_helpers.rails_blob_url(file, disposition: 'inline', host: ENV.fetch('HOST', 'http://localhost:3100')) if file.attached?
   end
 
   def file_name

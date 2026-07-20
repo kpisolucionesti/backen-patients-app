@@ -15,11 +15,11 @@ class Doctor < ApplicationRecord
     end
 
     def signature_url
-      rails_blob_url(signature, disposition: 'inline', host: ENV.fetch('HOST', 'http://localhost:3100')) if signature.attached?
+      Rails.application.routes.url_helpers.rails_blob_url(signature, disposition: 'inline', host: ENV.fetch('HOST', 'http://localhost:3100')) if signature.attached?
     end
 
     def stamp_url
-      rails_blob_url(stamp, disposition: 'inline', host: ENV.fetch('HOST', 'http://localhost:3100')) if stamp.attached?
+      Rails.application.routes.url_helpers.rails_blob_url(stamp, disposition: 'inline', host: ENV.fetch('HOST', 'http://localhost:3100')) if stamp.attached?
     end
 
     def has_signature
