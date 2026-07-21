@@ -22,14 +22,15 @@ module Quirofanos
     def weekly
       authorize!('quirofano.view')
       start_date = params[:start_date] ? Date.parse(params[:start_date]) : Date.current.beginning_of_week
+      end_date = params[:end_date] ? Date.parse(params[:end_date]) : start_date.end_of_week
 
-      surgeries = Surgery.where(surgery_date: start_date.all_week)
+      surgeries = Surgery.where(surgery_date: start_date.beginning_of_day..end_date.end_of_day)
                          .includes(:hospitalization, :patient, :area, :surgery_team_members)
                          .order(:scheduled_start_time)
 
       render json: {
         start_date: start_date,
-        end_date: start_date.end_of_week,
+        end_date: end_date,
         surgeries: surgeries.map { |s| serialize_surgery(s) }
       }, status: :ok
     end
@@ -57,6 +58,7 @@ module Quirofanos
         postop_notes: surgery.postop_notes,
         result: surgery.result,
         ambulatory: surgery.ambulatory?,
+        cancellation_reason: surgery.cancellation_reason,
         area: surgery.area ? { id: surgery.area.id, name: surgery.area.name } : nil,
         team_members: surgery.surgery_team_members.map { |m|
           {

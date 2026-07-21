@@ -11,7 +11,8 @@ class MedicalPlan < ApplicationRecord
     general: 'General'
   }.freeze
 
-  validates :description, presence: true
+  validates :emergency, presence: true
+  validates :description, presence: true, length: { maximum: 5000 }
   validates :indication_type, inclusion: { in: INDICATION_TYPES.keys.map(&:to_s) }
 
   scope :active, -> { where(status: 'active') }

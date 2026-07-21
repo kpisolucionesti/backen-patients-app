@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_08_20_000000) do
+ActiveRecord::Schema[7.0].define(version: 2026_08_25_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -122,6 +122,9 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_20_000000) do
     t.string "email"
     t.string "phone"
     t.bigint "specialty_id"
+    t.string "ci"
+    t.string "doctor_code"
+    t.string "sanidad_number"
     t.index ["specialty_id"], name: "index_doctors_on_specialty_id"
   end
 
@@ -133,6 +136,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_20_000000) do
     t.bigint "uploaded_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "report_type"
+    t.jsonb "metadata", default: {}
     t.index ["attachable_type", "attachable_id"], name: "idx_documents_on_attachable"
     t.index ["uploaded_by_id"], name: "index_documents_on_uploaded_by_id"
   end
@@ -475,6 +480,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_20_000000) do
     t.datetime "actual_start_time"
     t.datetime "actual_end_time"
     t.boolean "ambulatory", default: false
+    t.text "cancellation_reason"
     t.index ["area_id"], name: "index_surgeries_on_area_id"
     t.index ["hospitalization_id"], name: "index_surgeries_on_hospitalization_id"
     t.index ["patient_id"], name: "index_surgeries_on_patient_id"
@@ -558,6 +564,10 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_20_000000) do
     t.datetime "last_sign_in_at"
     t.datetime "last_sign_out_at"
     t.bigint "doctor_id"
+    t.integer "failed_attempts", default: 0, null: false
+    t.datetime "locked_at"
+    t.integer "lock_count", default: 0, null: false
+    t.datetime "blocked_at"
     t.index ["authentication_token"], name: "index_users_on_authentication_token", unique: true
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["doctor_id"], name: "index_users_on_doctor_id"

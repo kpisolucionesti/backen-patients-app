@@ -4,6 +4,10 @@ class HospitalizationNote < ApplicationRecord
 
   validates :note_type, inclusion: { in: %w[progress nursing admission discharge] }
   validates :recorded_at, presence: true
+  validates :subjective, length: { maximum: 5000 }, allow_blank: true
+  validates :objective, length: { maximum: 5000 }, allow_blank: true
+  validates :assessment, length: { maximum: 5000 }, allow_blank: true
+  validates :plan, length: { maximum: 5000 }, allow_blank: true
 
   NOTE_TYPES = {
     progress: 'Evolución Médica',

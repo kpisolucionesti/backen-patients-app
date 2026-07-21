@@ -5,8 +5,13 @@ class Appointment < ApplicationRecord
   belongs_to :created_by, class_name: 'User'
   has_one :appointment_record, dependent: :destroy
 
+  validates :patient, presence: true
+  validates :doctor, presence: true
+  validates :specialty, presence: true
+  validates :created_by, presence: true
   validates :appointment_date, presence: true
   validates :status, inclusion: { in: %w[scheduled confirmed in_consultation completed cancelled no_show] }
+  validates :notes, length: { maximum: 2000 }, allow_blank: true
 
   before_create :assign_turn_number
   before_create :calculate_end_time

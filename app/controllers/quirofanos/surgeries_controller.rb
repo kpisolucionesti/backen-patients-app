@@ -1,6 +1,7 @@
 module Quirofanos
   class SurgeriesController < ApplicationController
     before_action :authenticate_user!
+    before_action :set_surgery, only: [:update, :destroy, :close, :cancel]
 
     def index
       authorize!('quirofano.view')
@@ -38,22 +39,53 @@ module Quirofanos
 
     def update
       authorize!('quirofano.edit')
-      surgery = Surgery.find(params[:id])
-      if surgery.update(surgery_params)
-        render json: serialize_surgery(surgery), status: :ok
-      else
-        render json: { error: surgery.errors.full_messages.join(', ') }, status: :unprocessable_entity
+      if @surgery.finalized?
+        return render json: { error: 'No se puede modificar una cirugía que ya fue culminada o anulada' }, status: :unprocessable_entity
       end
+      if @surgery.update(surgery_params)
+        render json: serialize_surgery(@surgery), status: :ok
+      else
+        render json: { error: @surgery.errors.full_messages.join(', ') }, status: :unprocessable_entity
+      end
+    end
+
+    def close
+      authorize!('quirofano.edit')
+      if @surgery.finalized?
+        return render json: { error: 'La cirugía ya fue culminada o anulada' }, status: :unprocessable_entity
+      end
+      if @surgery.result.blank? || @surgery.postop_notes.blank?
+        return render json: { error: 'Debe completar el Resultado y las Notas Post-Op antes de culminar la cirugía' }, status: :unprocessable_entity
+      end
+      @surgery.update!(actual_end_time: Time.current) if @surgery.actual_end_time.blank?
+      @surgery.update!(status: 'completed')
+      render json: serialize_surgery(@surgery), status: :ok
+    end
+
+    def cancel
+      authorize!('quirofano.edit')
+      if @surgery.finalized?
+        return render json: { error: 'La cirugía ya fue culminada o anulada' }, status: :unprocessable_entity
+      end
+      reason = params[:cancellation_reason]
+      if reason.blank?
+        return render json: { error: 'Debe indicar el motivo de anulación' }, status: :unprocessable_entity
+      end
+      @surgery.update!(status: 'cancelled', cancellation_reason: reason)
+      render json: serialize_surgery(@surgery), status: :ok
     end
 
     def destroy
       authorize!('quirofano.edit')
-      surgery = Surgery.find(params[:id])
-      surgery.destroy!
+      @surgery.destroy!
       head :no_content
     end
 
     private
+
+    def set_surgery
+      @surgery = Surgery.find(params[:id])
+    end
 
     def surgery_params
       params.permit(:surgery_type, :description, :surgeon_name, :surgery_date, :status,
@@ -61,7 +93,8 @@ module Quirofanos
                     :hospitalization_id, :area_id, :patient_id,
                     :scheduled_start_time, :scheduled_end_time,
                     :actual_start_time, :actual_end_time,
-                    :anesthesiologist, :anesthesia_type, :ambulatory)
+                    :anesthesiologist, :anesthesia_type, :ambulatory,
+                    :cancellation_reason)
     end
 
     def serialize_surgery(surgery)
@@ -86,6 +119,7 @@ module Quirofanos
         anesthesiologist: surgery.anesthesiologist,
         anesthesia_type: surgery.anesthesia_type,
         ambulatory: surgery.ambulatory?,
+        cancellation_reason: surgery.cancellation_reason,
         patient: patient ? {
           id: patient.id,
           name: patient.name,

@@ -10,4 +10,7 @@ class DoctorRepresenter < Representable::Decorator
     property :stamp_url
     property :has_signature
     property :has_stamp
+    property :ci
+    property :doctor_code
+    property :sanidad_number
 end

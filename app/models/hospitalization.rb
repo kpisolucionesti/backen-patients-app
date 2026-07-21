@@ -9,8 +9,12 @@ class Hospitalization < ApplicationRecord
   has_many :medication_administrations, dependent: :destroy
   has_many :surgeries, dependent: :destroy
 
+  validates :emergency, presence: true
   validates :admission_date, presence: true
   validates :status, inclusion: { in: %w[active discharged] }
+  validates :admission_diagnosis, length: { maximum: 2000 }, allow_blank: true
+  validates :discharge_diagnosis, length: { maximum: 2000 }, allow_blank: true
+  validates :discharge_summary, length: { maximum: 5000 }, allow_blank: true
 
   scope :active, -> { where(status: 'active') }
 

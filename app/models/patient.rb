@@ -1,4 +1,6 @@
 class Patient < ApplicationRecord
+  GENDERS = %w[M F].freeze
+
   has_many :emergencies, dependent: :destroy
   has_many :notes, dependent: :destroy
   has_many :allergies, class_name: 'PatientAllergy', dependent: :destroy
@@ -13,8 +15,14 @@ class Patient < ApplicationRecord
   has_many :surgeries, dependent: :destroy
   belongs_to :created_by, class_name: 'User', optional: true
 
-  validates :ci, uniqueness: true
+  validates :ci, uniqueness: true, allow_nil: true
+  validates :name, presence: true
+  validates :lastname, presence: true
+  validates :gender, inclusion: { in: GENDERS }, allow_nil: true
+  validates :birthday, presence: true
   validates :medical_history_number, presence: true, uniqueness: true
+  validates :representante_ci, length: { maximum: 20 }, allow_blank: true
+  validates :representante, length: { maximum: 255 }, allow_blank: true
 
   before_save :normalize_ci
 

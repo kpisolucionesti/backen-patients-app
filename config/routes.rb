@@ -62,7 +62,12 @@ Rails.application.routes.draw do
   namespace :quirofanos do
     get :schedule, to: 'dashboard#schedule'
     get :weekly, to: 'dashboard#weekly'
-    resources :surgeries, only: [:index, :create, :update, :destroy], controller: 'surgeries'
+    resources :surgeries, only: [:index, :create, :update, :destroy], controller: 'surgeries' do
+      member do
+        put :close
+        put :cancel
+      end
+    end
   end
   resources :profiles do
     member do
@@ -73,6 +78,8 @@ Rails.application.routes.draw do
     member do
       put :change_password
       put :update_permissions
+      put :block
+      put :unblock
       get :emergencies
       get :activity_logs, to: 'user_activity_logs#index'
     end

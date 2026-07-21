@@ -20,6 +20,10 @@ groups:
         label: Cargar Laboratorios
       - key: emergencia.modificar_antecedentes
         label: Modificar Antecedentes
+      - key: emergencia.reportes
+        label: Generar Reportes
+      - key: emergencia.documentos
+        label: Gestionar Documentos
 
   - section: Historial
     color: '#fff3e0'
@@ -46,6 +50,8 @@ groups:
         label: Cargar Laboratorios
       - key: pacientes.modificar_antecedentes
         label: Modificar Antecedentes
+      - key: pacientes.documentos
+        label: Gestionar Documentos
 
   - section: Médicos
     color: '#f3e5f5'
@@ -70,6 +76,8 @@ groups:
         label: Editar
       - key: usuarios.suspend
         label: Suspender
+      - key: usuarios.block
+        label: Bloquear/Desbloquear
       - key: usuarios.manage_permissions
         label: Gestionar Permisos
       - key: usuarios.change_password
@@ -132,6 +140,10 @@ groups:
         label: Editar
       - key: hospitalizacion.nursing
         label: Enfermería
+      - key: hospitalizacion.reportes
+        label: Generar Reportes
+      - key: hospitalizacion.documentos
+        label: Gestionar Documentos
 
   - section: Quirófano
     color: '#f3e5f5'
@@ -142,6 +154,10 @@ groups:
         label: Editar
       - key: quirofano.schedule
         label: Programar
+      - key: quirofano.reportes
+        label: Generar Reportes
+      - key: quirofano.documentos
+        label: Gestionar Documentos
 
   - section: UCI
     color: '#e0f2f1'

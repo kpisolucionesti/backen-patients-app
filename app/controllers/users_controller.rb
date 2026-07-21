@@ -36,9 +36,11 @@ class UsersController < ApplicationController
     end
 
     def update
-        authorize!('usuarios.edit')
-        if @user.protected?
-            return render json: { error: "No se puede modificar este usuario" }, status: :forbidden
+        if @current_user != @user
+            authorize!('usuarios.edit')
+            if @user.protected?
+                return render json: { error: "No se puede modificar este usuario" }, status: :forbidden
+            end
         end
         if @user.update(update_params)
             UserActivityLog.create!(user: @current_user, action: 'update_user', description: "Actualizó usuario '#{@user.username}' (#{@user.name} #{@user.lastname})")
@@ -101,6 +103,28 @@ class UsersController < ApplicationController
         render json: ::EmergencyRepresenter.for_collection.new(user_emergencies), status: :ok
     end
 
+    def block
+        authorize!('usuarios.block')
+        user = User.find(params[:id])
+        if user.protected?
+            return render json: { error: "No se puede bloquear este usuario" }, status: :forbidden
+        end
+        user.update!(blocked_at: Time.current)
+        UserActivityLog.create!(user: @current_user, action: 'block_user', description: "Bloqueó usuario '#{user.username}' (#{user.name} #{user.lastname})")
+        render json: { message: "Usuario bloqueado", user: user_response(user) }, status: :ok
+    end
+
+    def unblock
+        authorize!('usuarios.block')
+        user = User.find(params[:id])
+        if user.protected?
+            return render json: { error: "No se puede desbloquear este usuario" }, status: :forbidden
+        end
+        user.update!(blocked_at: nil, locked_at: nil, failed_attempts: 0, lock_count: 0)
+        UserActivityLog.create!(user: @current_user, action: 'unblock_user', description: "Desbloqueó usuario '#{user.username}' (#{user.name} #{user.lastname})")
+        render json: { message: "Usuario desbloqueado", user: user_response(user) }, status: :ok
+    end
+
     private
 
     def user_params
@@ -130,7 +154,11 @@ class UsersController < ApplicationController
             is_admin: user.admin?,
             confirmed: user.confirmed?,
             must_change_password: user.must_change_password,
-            created_at: user.created_at
+            created_at: user.created_at,
+            failed_attempts: user.failed_attempts,
+            locked_at: user.locked_at,
+            lock_count: user.lock_count,
+            blocked_at: user.blocked_at
         }
     end
 end

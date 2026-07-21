@@ -3,8 +3,12 @@ class MedicationAdministration < ApplicationRecord
   belongs_to :medical_plan, optional: true
   belongs_to :administered_by, class_name: 'User', optional: true
 
-  validates :medication_name, presence: true
+  validates :medication_name, presence: true, length: { maximum: 255 }
   validates :status, inclusion: { in: %w[scheduled administered missed refused held] }
+  validates :dosage, length: { maximum: 255 }, allow_blank: true
+  validates :route, length: { maximum: 255 }, allow_blank: true
+  validates :frequency, length: { maximum: 255 }, allow_blank: true
+  validates :notes, length: { maximum: 2000 }, allow_blank: true
 
   STATUS_LABELS = {
     scheduled: 'Programado',

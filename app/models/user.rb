@@ -1,5 +1,7 @@
 class User < ApplicationRecord
   SESSION_IDLE_TIMEOUT = 15.minutes
+  MAX_FAILED_ATTEMPTS = 5
+  MAX_LOCKS = 3
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
@@ -37,25 +39,45 @@ class User < ApplicationRecord
     update!(last_activity_at: Time.current)
   end
 
+  def locked?
+    locked_at.present? || (failed_attempts.to_i >= MAX_FAILED_ATTEMPTS)
+  end
+
+  def blocked?
+    blocked_at.present?
+  end
+
+  def accessible?
+    status == 'active' && !locked? && !blocked?
+  end
+
+  def auto_unlock_if_expired!
+    return unless locked_at.present? && locked_at < 30.minutes.ago
+    update!(locked_at: nil, failed_attempts: 0)
+  end
+
   ALL_PERMISSIONS = [
     'emergencia.view', 'emergencia.create', 'emergencia.edit',
     'emergencia.anular', 'emergencia.triage', 'emergencia.discharge',
     'emergencia.assign_room', 'emergencia.cargar_laboratorios',
-    'emergencia.modificar_antecedentes',
+    'emergencia.modificar_antecedentes', 'emergencia.reportes', 'emergencia.documentos',
     'historial.view', 'historial.export',
     'configuraciones.view',
     'pacientes.view', 'pacientes.edit',
     'pacientes.cargar_laboratorios', 'pacientes.modificar_antecedentes',
+    'pacientes.documentos',
     'medicos.view', 'medicos.create', 'medicos.edit', 'medicos.suspend',
     'usuarios.view', 'usuarios.create', 'usuarios.edit',
-    'usuarios.suspend', 'usuarios.manage_permissions', 'usuarios.change_password',
+    'usuarios.suspend', 'usuarios.block', 'usuarios.manage_permissions', 'usuarios.change_password',
     'perfiles.view', 'perfiles.create', 'perfiles.edit', 'perfiles.delete',
     'areas.view', 'areas.create', 'areas.edit', 'areas.delete',
     'rooms.view', 'rooms.create', 'rooms.edit', 'rooms.delete',
     'notes.view', 'notes.create', 'notes.edit', 'notes.delete',
     'lab_params.view', 'lab_params.edit',
     'hospitalizacion.view', 'hospitalizacion.edit', 'hospitalizacion.nursing',
+    'hospitalizacion.reportes', 'hospitalizacion.documentos',
     'quirofano.view', 'quirofano.schedule', 'quirofano.edit',
+    'quirofano.reportes', 'quirofano.documentos',
     'uci.view', 'uci.edit', 'uci.nursing',
     'especialidades.view', 'especialidades.create', 'especialidades.edit', 'especialidades.delete',
     'agenda.edit',
