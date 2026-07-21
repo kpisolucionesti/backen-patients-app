@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_08_10_000002) do
+ActiveRecord::Schema[7.0].define(version: 2026_08_20_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -133,7 +133,6 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_10_000002) do
     t.bigint "uploaded_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "report_type"
     t.index ["attachable_type", "attachable_id"], name: "idx_documents_on_attachable"
     t.index ["uploaded_by_id"], name: "index_documents_on_uploaded_by_id"
   end

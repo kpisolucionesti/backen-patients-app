@@ -140,6 +140,9 @@ Rails.application.routes.draw do
     end
   end
 
+  get 'emergencies/:emergency_id/medical_history', to: 'medical_history#for_emergency'
+  get 'hospitalizations/:hospitalization_id/medical_history', to: 'medical_history#for_hospitalization'
+
   resources :notifications, only: [:index] do
     member do
       put :mark_read
