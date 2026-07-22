@@ -10,9 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_08_25_000001) do
+ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "access_policies", force: :cascade do |t|
+    t.boolean "require_2fa", default: false
+    t.boolean "ip_restriction_enabled", default: false
+    t.text "allowed_ips"
+    t.text "blocked_ips"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -97,6 +106,34 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_25_000001) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_areas_on_name", unique: true
+  end
+
+  create_table "backup_configurations", force: :cascade do |t|
+    t.string "provider", default: "local"
+    t.string "destination_path"
+    t.string "access_key_id"
+    t.string "secret_access_key"
+    t.string "region"
+    t.string "cron_schedule", default: "0 2 * * *"
+    t.integer "retention_days", default: 30
+    t.boolean "include_uploads", default: true
+    t.boolean "is_active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "company_settings", force: :cascade do |t|
+    t.string "company_name", default: "Emerboard", null: false
+    t.string "rif"
+    t.string "address"
+    t.string "city"
+    t.string "state"
+    t.string "country", default: "VE"
+    t.string "phone"
+    t.string "email"
+    t.string "website"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "doctor_schedules", force: :cascade do |t|
@@ -192,6 +229,16 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_25_000001) do
     t.index ["emergency_id"], name: "index_emergency_doctors_on_emergency_id"
   end
 
+  create_table "emergency_modes", force: :cascade do |t|
+    t.boolean "system_blocked", default: false
+    t.text "block_message", default: "Sistema en mantenimiento. Intente más tarde."
+    t.datetime "blocked_at"
+    t.bigint "blocked_by_id"
+    t.datetime "scheduled_unblock_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "fluid_balances", force: :cascade do |t|
     t.bigint "hospitalization_id", null: false
     t.bigint "recorded_by_id"
@@ -205,6 +252,16 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_25_000001) do
     t.index ["hospitalization_id"], name: "index_fluid_balances_on_hospitalization_id"
     t.index ["recorded_at"], name: "index_fluid_balances_on_recorded_at"
     t.index ["recorded_by_id"], name: "index_fluid_balances_on_recorded_by_id"
+  end
+
+  create_table "general_settings", force: :cascade do |t|
+    t.string "timezone", default: "America/Caracas"
+    t.string "date_format", default: "dd/MM/yyyy"
+    t.string "time_format", default: "HH:mm"
+    t.string "locale", default: "es"
+    t.boolean "notifications_enabled", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "hospitalization_notes", force: :cascade do |t|
@@ -374,6 +431,19 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_25_000001) do
     t.index ["emergency_id"], name: "index_paraclinical_studies_on_emergency_id"
   end
 
+  create_table "password_policies", force: :cascade do |t|
+    t.integer "min_length", default: 8
+    t.boolean "require_uppercase", default: true
+    t.boolean "require_lowercase", default: true
+    t.boolean "require_number", default: true
+    t.boolean "require_special_char", default: true
+    t.integer "expiry_days", default: 0
+    t.integer "max_failed_attempts", default: 5
+    t.integer "lockout_duration_minutes", default: 30
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "patient_allergies", force: :cascade do |t|
     t.bigint "patient_id", null: false
     t.string "allergy", null: false
@@ -395,6 +465,36 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_25_000001) do
     t.text "medication"
     t.string "category"
     t.index ["patient_id"], name: "index_patient_antecedents_on_patient_id"
+  end
+
+  create_table "patient_family_antecedents", force: :cascade do |t|
+    t.bigint "patient_id", null: false
+    t.string "patologia", null: false
+    t.string "parentesco"
+    t.string "valor"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["patient_id"], name: "index_patient_family_antecedents_on_patient_id"
+  end
+
+  create_table "patient_gynecological_histories", force: :cascade do |t|
+    t.bigint "patient_id", null: false
+    t.string "evento", null: false
+    t.date "fecha_ultimo_evento"
+    t.text "observaciones"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["patient_id"], name: "index_patient_gynecological_histories_on_patient_id"
+  end
+
+  create_table "patient_lifestyle_habits", force: :cascade do |t|
+    t.bigint "patient_id", null: false
+    t.string "habito", null: false
+    t.string "concurrencia"
+    t.text "observaciones"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["patient_id"], name: "index_patient_lifestyle_habits_on_patient_id"
   end
 
   create_table "patients", force: :cascade do |t|
@@ -452,6 +552,13 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_25_000001) do
     t.index ["area_id"], name: "index_rooms_on_area_id"
   end
 
+  create_table "session_settings", force: :cascade do |t|
+    t.integer "idle_timeout_minutes", default: 15
+    t.boolean "allow_concurrent_sessions", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "specialties", force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
@@ -459,6 +566,20 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_25_000001) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_specialties_on_name", unique: true
+  end
+
+  create_table "storage_configurations", force: :cascade do |t|
+    t.string "provider", default: "local"
+    t.string "endpoint"
+    t.string "region"
+    t.string "bucket"
+    t.string "access_key_id"
+    t.string "secret_access_key"
+    t.string "local_path", default: "./storage"
+    t.integer "max_file_size_mb", default: 10
+    t.boolean "use_ssl", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "surgeries", force: :cascade do |t|
@@ -540,6 +661,10 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_25_000001) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "ip_address"
+    t.string "user_agent"
+    t.jsonb "metadata", default: {}
+    t.index ["created_at"], name: "index_user_activity_logs_on_created_at"
     t.index ["user_id"], name: "index_user_activity_logs_on_user_id"
   end
 
@@ -641,6 +766,9 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_25_000001) do
   add_foreign_key "paraclinical_studies", "emergencies"
   add_foreign_key "patient_allergies", "patients"
   add_foreign_key "patient_antecedents", "patients"
+  add_foreign_key "patient_family_antecedents", "patients"
+  add_foreign_key "patient_gynecological_histories", "patients"
+  add_foreign_key "patient_lifestyle_habits", "patients"
   add_foreign_key "patients", "users", column: "created_by_id"
   add_foreign_key "physical_exams", "emergencies"
   add_foreign_key "rooms", "areas"

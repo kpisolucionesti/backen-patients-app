@@ -10,6 +10,9 @@ Rails.application.routes.draw do
     end
     resources :allergies, controller: 'patient_allergies', only: [:index, :create, :update, :destroy]
     resources :antecedents, controller: 'patient_antecedents', only: [:index, :create, :update, :destroy]
+    resources :family_antecedents, controller: 'patient_family_antecedents', only: [:index, :create, :update, :destroy]
+    resources :gynecological_histories, controller: 'patient_gynecological_histories', only: [:index, :create, :update, :destroy]
+    resources :lifestyle_habits, controller: 'patient_lifestyle_habits', only: [:index, :create, :update, :destroy]
     resources :surgeries, only: [:index], controller: 'patient_surgeries'
   end
   resources :doctors do

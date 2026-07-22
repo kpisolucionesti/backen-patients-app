@@ -8,7 +8,7 @@ class Emergency < ApplicationRecord
 
   VALID_STATUSES = (0..5).to_a.freeze
 
-  CLASSIFICATIONS = %w[triage_iv triage_iii triage_ii triage_i consulta_externa].freeze
+  CLASSIFICATIONS = %w[red orange yellow green blue triage_iv triage_iii triage_ii triage_i consulta_externa].freeze
 
   belongs_to :patient
   belongs_to :created_by, class_name: 'User', optional: true

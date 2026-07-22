@@ -5,6 +5,9 @@ class Patient < ApplicationRecord
   has_many :notes, dependent: :destroy
   has_many :allergies, class_name: 'PatientAllergy', dependent: :destroy
   has_many :antecedents, class_name: 'PatientAntecedent', dependent: :destroy
+  has_many :family_antecedents, class_name: 'PatientFamilyAntecedent', dependent: :destroy
+  has_many :gynecological_histories, class_name: 'PatientGynecologicalHistory', dependent: :destroy
+  has_many :lifestyle_habits, class_name: 'PatientLifestyleHabit', dependent: :destroy
   has_many :appointments, dependent: :destroy
 
   scope :active, -> { where(disabled: [nil, false]) }
