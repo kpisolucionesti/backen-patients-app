@@ -4,7 +4,7 @@ class HospitalizationsController < ApplicationController
   def historical
     authorize!('hospitalizacion.view')
     hospitalizations = Hospitalization.where(status: 'discharged')
-                                      .includes(emergency: [:patient, :doctors])
+                                      .includes(:admitting_doctor, :attending_doctor, :room, emergency: [:patient, :doctors])
                                       .order(discharge_date: :desc)
 
     if params[:patient_id].present?
@@ -29,9 +29,9 @@ class HospitalizationsController < ApplicationController
   def show
     authorize!('hospitalizacion.view')
     hospitalization = if params[:emergency_id]
-      Hospitalization.find_by!(emergency_id: params[:emergency_id])
+      Hospitalization.includes(:admitting_doctor, :attending_doctor, :room, :surgeries, emergency: [:patient, :doctors]).find_by!(emergency_id: params[:emergency_id])
     else
-      Hospitalization.find(params[:id])
+      Hospitalization.includes(:admitting_doctor, :attending_doctor, :room, :surgeries, emergency: [:patient, :doctors]).find(params[:id])
     end
     render json: ::HospitalizationRepresenter.new(hospitalization), status: :ok
   end
@@ -126,7 +126,7 @@ class HospitalizationsController < ApplicationController
 
     page = (params[:page] || 1).to_i
     per_page = (params[:per_page] || 50).to_i
-    hospitalizations = Hospitalization.active.includes(emergency: [:patient, :doctors, :vital_signs])
+    hospitalizations = Hospitalization.active.includes(:admitting_doctor, :attending_doctor, :room, :surgeries, emergency: [:patient, :doctors, :vital_signs])
                                      .order(admission_date: :desc)
                                      .limit(per_page).offset((page - 1) * per_page)
 

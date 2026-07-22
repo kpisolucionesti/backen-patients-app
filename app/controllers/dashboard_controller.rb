@@ -4,6 +4,16 @@ class DashboardController < ApplicationController
     def stats
         authorize!('emergencia.view')
 
+        cache_key = "dashboard/stats/#{params[:year] || Date.current.year}/#{Date.current.strftime('%Y-%m-%d')}"
+        data = Rails.cache.fetch(cache_key, expires_in: 5.minutes) do
+          compute_stats
+        end
+        render json: data, status: :ok
+    end
+
+    private
+
+    def compute_stats
         year = params[:year] || Date.current.year
         today = Date.current
 
@@ -38,7 +48,7 @@ class DashboardController < ApplicationController
             .map { |month, count| { month: month, count: count } }
             .sort_by { |m| m[:month] }
 
-        recent_emergencies = Emergency.includes(:patient, :emergency_doctors)
+        recent_emergencies = Emergency.includes(:patient, emergency_doctors: :doctor)
             .where('created_at >= ?', 24.hours.ago)
             .order(created_at: :desc)
             .limit(20)
@@ -112,7 +122,7 @@ class DashboardController < ApplicationController
         # -- Pacientes --
         total_patients = Patient.where(disabled: [nil, false]).count
 
-        render json: {
+        {
             # Emergencias
             active_emergencies: active_emergencies,
             total_emergencies: total_emergencies,
@@ -138,6 +148,6 @@ class DashboardController < ApplicationController
             surgeries_by_type: surgeries_by_type,
             # Pacientes
             total_patients: total_patients,
-        }, status: :ok
+        }
     end
 end

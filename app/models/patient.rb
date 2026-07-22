@@ -1,5 +1,5 @@
 class Patient < ApplicationRecord
-  GENDERS = %w[M F].freeze
+  GENDERS = %w[M F O].freeze
 
   has_many :emergencies, dependent: :destroy
   has_many :notes, dependent: :destroy
@@ -25,6 +25,7 @@ class Patient < ApplicationRecord
   validates :representante, length: { maximum: 255 }, allow_blank: true
 
   before_save :normalize_ci
+  before_save :normalize_gender
 
   def age
     return nil unless birthday
@@ -41,21 +42,22 @@ class Patient < ApplicationRecord
   end
 
   def stats
-    total_visits = emergencies.count
-    last_visit = emergencies.order(ingress_date: :desc).first
-    hospitalized_surgeries_count = Hospitalization.joins(:emergency)
-                                                   .where(emergencies: { patient_id: id })
-                                                   .joins(:surgeries)
-                                                   .count
-    ambulatory_surgeries_count = surgeries.where(hospitalization_id: nil).count
-    surgeries_count = hospitalized_surgeries_count + ambulatory_surgeries_count
+    emergency_data = emergencies.pick(Arel.sql("count(*)"), Arel.sql("MAX(ingress_date)"), Arel.sql("MAX(status)"))
+    total_visits = emergency_data[0] || 0
+    last_visit_date = emergency_data[1]
+    last_visit_status = emergency_data[2]
     hospitalizations_count = Hospitalization.joins(:emergency)
                                             .where(emergencies: { patient_id: id })
                                             .count
+    ambulatory_surgeries_count = surgeries.where(hospitalization_id: nil).count
+    hospitalized_surgeries_count = Surgery.joins(hospitalization: :emergency)
+                                          .where(emergencies: { patient_id: id })
+                                          .count
+    surgeries_count = hospitalized_surgeries_count + ambulatory_surgeries_count
     {
       total_visits: total_visits,
-      last_visit_date: last_visit&.ingress_date,
-      last_visit_status: last_visit&.status,
+      last_visit_date: last_visit_date,
+      last_visit_status: last_visit_status,
       age: age,
       surgeries: surgeries_count,
       hospitalizations: hospitalizations_count,
@@ -69,5 +71,24 @@ class Patient < ApplicationRecord
     return unless ci_changed? || representante_ci_changed?
     self.ci = ci&.gsub(/\D/, '')
     self.representante_ci = representante_ci&.gsub(/\D/, '')
+  end
+
+  GENDER_MAP = {
+    'Masculino' => 'M',
+    'Femenino'  => 'F',
+    'Otros'     => 'O',
+    'M'         => 'M',
+    'F'         => 'F',
+    'O'         => 'O',
+  }.freeze
+
+  def normalize_gender
+    return if gender.blank?
+    normalized = GENDER_MAP[gender]
+    if normalized
+      self.gender = normalized
+    else
+      self.gender = 'O'
+    end
   end
 end

@@ -7,7 +7,7 @@ class PatientSurgeriesController < ApplicationController
     surgeries = Surgery.where(patient_id: @patient.id)
                        .or(Surgery.where(hospitalization_id: Hospitalization.joins(:emergency)
                          .where(emergencies: { patient_id: @patient.id }).pluck(:id)))
-                       .includes(:area, :hospitalization)
+                       .includes(:area, :hospitalization, surgery_team_members: :doctor)
                        .order(surgery_date: :desc, scheduled_start_time: :asc)
     render json: {
       data: surgeries.map { |s| serialize_surgery(s) }
@@ -50,7 +50,7 @@ class PatientSurgeriesController < ApplicationController
         gender: patient.gender,
         age: patient.age
       } : nil,
-      team_members: surgery.surgery_team_members.includes(:doctor).map { |tm|
+      team_members: surgery.surgery_team_members.map { |tm|
         {
           id: tm.id,
           role: tm.role,

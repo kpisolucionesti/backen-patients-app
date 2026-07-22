@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_08_25_000000) do
+ActiveRecord::Schema[7.0].define(version: 2026_08_25_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -173,7 +173,9 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_25_000000) do
     t.text "current_illness"
     t.text "discharge_note"
     t.text "admission_note"
+    t.index ["created_at"], name: "index_emergencies_on_created_at"
     t.index ["created_by_id"], name: "index_emergencies_on_created_by_id"
+    t.index ["egress_at"], name: "index_emergencies_on_egress_at"
     t.index ["ingress_date"], name: "index_emergencies_on_ingress_date"
     t.index ["patient_id", "status"], name: "index_emergencies_on_patient_id_and_status"
     t.index ["patient_id"], name: "index_emergencies_on_patient_id"
@@ -347,6 +349,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_25_000000) do
     t.bigint "emergency_id"
     t.index ["created_by_id"], name: "index_notes_on_created_by_id"
     t.index ["emergency_id"], name: "index_notes_on_emergency_id"
+    t.index ["patient_id"], name: "index_notes_on_patient_id"
   end
 
   create_table "notifications", force: :cascade do |t|

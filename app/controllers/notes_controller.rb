@@ -4,7 +4,7 @@ class NotesController < ApplicationController
 
     def index
         authorize!('notes.view')
-        note = Note.all
+        note = Note.all.includes(:patient, :created_by)
         note = note.where(patient_id: params[:patient_id]) if params[:patient_id].present?
         note = note.where(emergency_id: params[:emergency_id]) if params[:emergency_id].present?
         render json: ::NoteRepresenter.for_collection.new(note),status: :ok

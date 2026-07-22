@@ -120,6 +120,22 @@ Rails.application.routes.draw do
     post :test
   end
 
+  resource :company_settings, only: [:show, :update]
+  resource :storage_configurations, only: [:show, :update]
+  resource :password_policies, only: [:show, :update]
+  resource :session_settings, only: [:show, :update]
+  resource :access_policies, only: [:show, :update]
+  resource :general_settings, only: [:show, :update]
+  resource :emergency_modes, only: [:show, :update] do
+    post :block
+    post :unblock
+  end
+  resource :backup_configurations, only: [:show, :update] do
+    post :run_now
+  end
+
+  get 'audit_logs', to: 'audit_logs#index'
+
   resources :appointment_displays
 
   resources :appointments, only: [:index, :show, :create, :update] do

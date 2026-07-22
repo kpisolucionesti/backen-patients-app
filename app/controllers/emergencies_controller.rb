@@ -1,10 +1,10 @@
 class EmergenciesController < ApplicationController
     before_action :authenticate_tv_or_user!
-    before_action :set_emergency, only: [:update, :destroy, :show]
+    before_action :set_emergency, only: [:update, :destroy]
 
     def index
         authorize!('emergencia.view')
-        emergencies = Emergency.includes(:patient, :doctors, :medical_plans)
+        emergencies = Emergency.includes(:patient, :doctors, :medical_plans, :vital_signs)
 
         if params[:status].present?
             emergencies = emergencies.where(status: params[:status])
@@ -50,7 +50,7 @@ class EmergenciesController < ApplicationController
 
     def show
         authorize!('emergencia.view')
-        @emergency = Emergency.includes(:patient, :doctors, :medical_plans).find(params[:id])
+        @emergency = Emergency.includes(:patient, :doctors, :medical_plans, :vital_signs).find(params[:id])
         render json: ::EmergencyRepresenter.new(@emergency), status: :ok
     end
 
@@ -153,6 +153,6 @@ class EmergenciesController < ApplicationController
     end
 
     def set_emergency
-        @emergency = Emergency.find(params[:id])
+        @emergency = Emergency.includes(:patient).find(params[:id])
     end
 end

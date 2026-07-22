@@ -4,7 +4,7 @@ class PatientsController < ApplicationController
 
     def index
         authorize!('pacientes.view')
-        patients = Patient.all.includes(:emergencies).order(lastname: :asc)
+        patients = Patient.all.includes(:emergencies, :allergies, :antecedents).order(lastname: :asc)
 
         if params[:q].present?
             q = "%#{params[:q]}%"
@@ -72,7 +72,7 @@ class PatientsController < ApplicationController
             UserActivityLog.create!(user: @current_user, action: 'update_patient', description: "Editó datos del paciente #{@patient.name} #{@patient.lastname} (CI: #{@patient.ci})")
             render json: ::PatientRepresenter.new(@patient), status: :ok
         else
-            render json: { error: "No se pudo guardar" }, status: :unprocessable_entity
+            render json: { error: "No se pudo guardar", errors: @patient.errors.full_messages }, status: :unprocessable_entity
         end
     end
 
