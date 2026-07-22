@@ -120,7 +120,7 @@ class UsersController < ApplicationController
         if user.protected?
             return render json: { error: "No se puede desbloquear este usuario" }, status: :forbidden
         end
-        user.update!(blocked_at: nil, locked_at: nil, failed_attempts: 0, lock_count: 0)
+        user.update!(blocked_at: nil, locked_at: nil, failed_attempts: 0, lock_count: 0, status: 'active')
         UserActivityLog.create!(user: @current_user, action: 'unblock_user', description: "Desbloqueó usuario '#{user.username}' (#{user.name} #{user.lastname})")
         render json: { message: "Usuario desbloqueado", user: user_response(user) }, status: :ok
     end
