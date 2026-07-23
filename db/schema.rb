@@ -252,6 +252,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
     t.index ["emergency_id", "doctor_id"], name: "index_evaluations_on_emergency_id_and_doctor_id", unique: true
     t.index ["emergency_id"], name: "index_evaluations_on_emergency_id"
   end
+
   create_table "fluid_balances", force: :cascade do |t|
     t.bigint "hospitalization_id", null: false
     t.bigint "recorded_by_id"
