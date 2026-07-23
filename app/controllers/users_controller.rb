@@ -150,6 +150,7 @@ class UsersController < ApplicationController
             profile_id: user.profile_id,
             profile_name: user.profile&.name,
             doctor_id: user.doctor_id,
+            doctor_name: user.doctor&.name,
             permissions: user.effective_permissions,
             is_admin: user.admin?,
             confirmed: user.confirmed?,

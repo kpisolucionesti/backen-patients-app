@@ -239,6 +239,19 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "evaluations", force: :cascade do |t|
+    t.bigint "emergency_id", null: false
+    t.bigint "doctor_id", null: false
+    t.text "diagnostic_impression"
+    t.text "plan"
+    t.bigint "created_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_evaluations_on_created_by_id"
+    t.index ["doctor_id"], name: "index_evaluations_on_doctor_id"
+    t.index ["emergency_id", "doctor_id"], name: "index_evaluations_on_emergency_id_and_doctor_id", unique: true
+    t.index ["emergency_id"], name: "index_evaluations_on_emergency_id"
+  end
   create_table "fluid_balances", force: :cascade do |t|
     t.bigint "hospitalization_id", null: false
     t.bigint "recorded_by_id"
@@ -543,6 +556,21 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
     t.index ["name"], name: "index_profiles_on_name", unique: true
   end
 
+  create_table "recipes", force: :cascade do |t|
+    t.bigint "emergency_id", null: false
+    t.bigint "doctor_id", null: false
+    t.string "medication", null: false
+    t.string "dosage"
+    t.string "frequency"
+    t.string "duration"
+    t.string "route"
+    t.text "indications"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["doctor_id"], name: "index_recipes_on_doctor_id"
+    t.index ["emergency_id"], name: "index_recipes_on_emergency_id"
+  end
+
   create_table "rooms", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -741,6 +769,9 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
   add_foreign_key "emergencies", "users", column: "created_by_id"
   add_foreign_key "emergency_doctors", "doctors"
   add_foreign_key "emergency_doctors", "emergencies"
+  add_foreign_key "evaluations", "doctors"
+  add_foreign_key "evaluations", "emergencies"
+  add_foreign_key "evaluations", "users", column: "created_by_id"
   add_foreign_key "fluid_balances", "hospitalizations"
   add_foreign_key "fluid_balances", "users", column: "recorded_by_id"
   add_foreign_key "hospitalization_notes", "hospitalizations"
@@ -771,6 +802,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
   add_foreign_key "patient_lifestyle_habits", "patients"
   add_foreign_key "patients", "users", column: "created_by_id"
   add_foreign_key "physical_exams", "emergencies"
+  add_foreign_key "recipes", "doctors"
+  add_foreign_key "recipes", "emergencies"
   add_foreign_key "rooms", "areas"
   add_foreign_key "surgeries", "hospitalizations"
   add_foreign_key "surgery_team_members", "doctors"

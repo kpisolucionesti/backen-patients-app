@@ -47,4 +47,8 @@ class EmergencyRepresenter < Representable::Decorator
     collection :medical_plans, decorator: MedicalPlanRepresenter
 
     collection :vital_signs, decorator: VitalSignRepresenter
+
+    collection :evaluations, decorator: EvaluationRepresenter
+
+    collection :recipes, decorator: RecipeRepresenter
 end

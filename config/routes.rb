@@ -29,6 +29,8 @@ Rails.application.routes.draw do
     resources :paraclinical_studies, only: [:index, :create, :update, :destroy]
     resources :physical_exams, only: [:index, :create, :update]
     resources :laboratory_results, only: [:index, :show, :create, :update, :destroy]
+    resources :evaluations, only: [:index, :create, :update, :destroy]
+    resources :recipes, only: [:index, :create, :update, :destroy]
     resource  :hospitalization, only: [:show, :create, :update] do
       member do
         post :discharge

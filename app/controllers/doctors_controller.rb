@@ -27,6 +27,7 @@ class DoctorsController < ApplicationController
     def create
         authorize!('medicos.create')
         doctor = Doctor.create!(doctor_params)
+        associate_user(doctor)
         UserActivityLog.create!(user: @current_user, action: 'create_doctor', description: "Creó médico '#{doctor.name}'")
         render json: DoctorRepresenter.new(doctor), status: :created
     end
@@ -34,6 +35,7 @@ class DoctorsController < ApplicationController
     def update
         authorize!('medicos.edit')
         @doctor.update!(doctor_params)
+        associate_user(@doctor)
         UserActivityLog.create!(user: @current_user, action: 'update_doctor', description: "Actualizó médico '#{@doctor.name}'")
         render json: DoctorRepresenter.new(@doctor), status: :ok
     end
@@ -49,6 +51,29 @@ class DoctorsController < ApplicationController
 
     def doctor_params
         params.permit(:name, :specialty_id, :email, :phone, :status, :signature, :stamp, :ci, :doctor_code, :sanidad_number)
+    end
+
+    def associate_user(doctor)
+        if params[:user_id].present?
+            user = User.find(params[:user_id])
+            user.update!(doctor_id: doctor.id)
+        elsif params[:user_attributes].present?
+            ua = params[:user_attributes]
+            username = ua[:username].presence || "#{doctor.name.parameterize}#{doctor.id}"
+            user = User.new(
+                username: username,
+                name: ua[:name].presence || doctor.name,
+                lastname: ua[:lastname] || '',
+                email: ua[:email].presence || doctor.email,
+                doctor_id: doctor.id
+            )
+            temp_password = "Emerboard20-"
+            user.password = temp_password
+            user.password_confirmation = temp_password
+            user.profile ||= Profile.find_by(name: 'User')
+            user.skip_confirmation!
+            user.save!
+        end
     end
 
     def set_doctor

@@ -13,4 +13,5 @@ class DoctorRepresenter < Representable::Decorator
     property :ci
     property :doctor_code
     property :sanidad_number
+    property :user_id
 end

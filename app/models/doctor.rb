@@ -3,6 +3,13 @@ class Doctor < ApplicationRecord
     has_many :emergency_doctors, dependent: :destroy
     has_many :emergencies, through: :emergency_doctors
     has_many :schedules, class_name: 'DoctorSchedule', dependent: :destroy
+    has_many :evaluations, dependent: :destroy
+    has_many :recipes, dependent: :destroy
+    has_many :users, dependent: :restrict_with_error
+
+    def user_id
+      users.first&.id
+    end
 
     has_one_attached :signature
     has_one_attached :stamp

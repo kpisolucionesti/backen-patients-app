@@ -22,6 +22,8 @@ class Emergency < ApplicationRecord
   has_one :physical_exam, dependent: :destroy
   has_many :laboratory_results, dependent: :destroy
   has_one :hospitalization, dependent: :destroy
+  has_many :evaluations, dependent: :destroy
+  has_many :recipes, dependent: :destroy
 
   validates :patient, presence: true
   validates :status, inclusion: { in: VALID_STATUSES }, allow_nil: true
