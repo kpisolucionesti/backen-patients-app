@@ -6,6 +6,8 @@ class EvaluationRepresenter < Representable::Decorator
   property :doctor_id
   property :diagnostic_impression
   property :plan
+  property :current_illness
+  property :suggestions
   property :created_at
   property :updated_at
 

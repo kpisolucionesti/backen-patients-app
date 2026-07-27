@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_01_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -122,6 +122,17 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "clinical_study_classifications", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "key", null: false
+    t.string "color"
+    t.integer "sort_order", default: 0
+    t.boolean "is_active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_clinical_study_classifications_on_key", unique: true
+  end
+
   create_table "company_settings", force: :cascade do |t|
     t.string "company_name", default: "Emerboard", null: false
     t.string "rif"
@@ -210,6 +221,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
     t.text "current_illness"
     t.text "discharge_note"
     t.text "admission_note"
+    t.string "final_diagnostic", limit: 2000
     t.index ["created_at"], name: "index_emergencies_on_created_at"
     t.index ["created_by_id"], name: "index_emergencies_on_created_by_id"
     t.index ["egress_at"], name: "index_emergencies_on_egress_at"
@@ -247,9 +259,11 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
     t.bigint "created_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "current_illness"
+    t.text "suggestions"
     t.index ["created_by_id"], name: "index_evaluations_on_created_by_id"
     t.index ["doctor_id"], name: "index_evaluations_on_doctor_id"
-    t.index ["emergency_id", "doctor_id"], name: "index_evaluations_on_emergency_id_and_doctor_id", unique: true
+    t.index ["emergency_id", "doctor_id"], name: "index_evaluations_on_emergency_id_and_doctor_id"
     t.index ["emergency_id"], name: "index_evaluations_on_emergency_id"
   end
 
@@ -309,6 +323,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
     t.string "status", default: "active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "current_diagnosis"
+    t.text "final_diagnosis"
     t.index ["admitting_doctor_id"], name: "index_hospitalizations_on_admitting_doctor_id"
     t.index ["attending_doctor_id"], name: "index_hospitalizations_on_attending_doctor_id"
     t.index ["emergency_id", "status"], name: "index_hospitalizations_on_emergency_id_and_status", unique: true, where: "((status)::text = 'active'::text)"
@@ -350,6 +366,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
     t.string "abbreviation"
     t.jsonb "reference_ranges", default: {}
     t.boolean "is_active", default: true, null: false
+    t.bigint "clinical_study_classification_id"
+    t.index ["clinical_study_classification_id"], name: "index_lab_parameters_on_clinical_study_classification_id"
     t.index ["lab_parameter_group_id"], name: "index_lab_parameters_on_lab_parameter_group_id"
   end
 
@@ -391,7 +409,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
   end
 
   create_table "medication_administrations", force: :cascade do |t|
-    t.bigint "hospitalization_id", null: false
+    t.bigint "hospitalization_id"
     t.bigint "medical_plan_id"
     t.bigint "administered_by_id"
     t.string "medication_name", null: false
@@ -404,7 +422,9 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "emergency_id"
     t.index ["administered_by_id"], name: "index_medication_administrations_on_administered_by_id"
+    t.index ["emergency_id"], name: "index_medication_administrations_on_emergency_id"
     t.index ["hospitalization_id"], name: "index_medication_administrations_on_hospitalization_id"
     t.index ["medical_plan_id"], name: "index_medication_administrations_on_medical_plan_id"
     t.index ["scheduled_at"], name: "index_medication_administrations_on_scheduled_at"
@@ -418,8 +438,10 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
     t.integer "patient_id"
     t.bigint "created_by_id"
     t.bigint "emergency_id"
+    t.string "note_type", default: "general"
     t.index ["created_by_id"], name: "index_notes_on_created_by_id"
     t.index ["emergency_id"], name: "index_notes_on_emergency_id"
+    t.index ["note_type"], name: "index_notes_on_note_type"
     t.index ["patient_id"], name: "index_notes_on_patient_id"
   end
 
@@ -545,6 +567,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
     t.text "neurologico"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "doctor_id"
+    t.index ["doctor_id"], name: "index_physical_exams_on_doctor_id"
     t.index ["emergency_id"], name: "index_physical_exams_on_emergency_id"
   end
 
@@ -784,12 +808,14 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
   add_foreign_key "interconsultations", "doctors", column: "doctor_requested_id"
   add_foreign_key "interconsultations", "emergencies"
   add_foreign_key "interconsultations", "users", column: "requested_by_id"
+  add_foreign_key "lab_parameters", "clinical_study_classifications"
   add_foreign_key "lab_parameters", "lab_parameter_groups"
   add_foreign_key "lab_result_values", "laboratory_results"
   add_foreign_key "laboratory_results", "emergencies"
   add_foreign_key "medical_plans", "doctors"
   add_foreign_key "medical_plans", "emergencies"
   add_foreign_key "medical_plans", "users", column: "created_by_id"
+  add_foreign_key "medication_administrations", "emergencies"
   add_foreign_key "medication_administrations", "hospitalizations"
   add_foreign_key "medication_administrations", "medical_plans"
   add_foreign_key "medication_administrations", "users", column: "administered_by_id"
@@ -802,6 +828,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_08_27_000003) do
   add_foreign_key "patient_gynecological_histories", "patients"
   add_foreign_key "patient_lifestyle_habits", "patients"
   add_foreign_key "patients", "users", column: "created_by_id"
+  add_foreign_key "physical_exams", "doctors"
   add_foreign_key "physical_exams", "emergencies"
   add_foreign_key "recipes", "doctors"
   add_foreign_key "recipes", "emergencies"

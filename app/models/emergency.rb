@@ -19,11 +19,12 @@ class Emergency < ApplicationRecord
   has_many :notes, dependent: :nullify
   has_many :vital_signs, dependent: :destroy
   has_many :paraclinical_studies, dependent: :destroy
-  has_one :physical_exam, dependent: :destroy
+  has_many :physical_exams, dependent: :destroy
   has_many :laboratory_results, dependent: :destroy
   has_one :hospitalization, dependent: :destroy
   has_many :evaluations, dependent: :destroy
   has_many :recipes, dependent: :destroy
+  has_many :medication_administrations, dependent: :destroy
 
   validates :patient, presence: true
   validates :status, inclusion: { in: VALID_STATUSES }, allow_nil: true
@@ -36,6 +37,7 @@ class Emergency < ApplicationRecord
   validates :discharge_note, length: { maximum: 5000 }, allow_blank: true
   validates :admission_note, length: { maximum: 5000 }, allow_blank: true
   validates :cause_of_death, length: { maximum: 2000 }, allow_blank: true
+  validates :final_diagnostic, length: { maximum: 2000 }, allow_blank: true
 
   def primary_doctor
     emergency_doctors.find_by(primary: true)&.doctor

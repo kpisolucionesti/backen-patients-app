@@ -31,6 +31,7 @@ Rails.application.routes.draw do
     resources :laboratory_results, only: [:index, :show, :create, :update, :destroy]
     resources :evaluations, only: [:index, :create, :update, :destroy]
     resources :recipes, only: [:index, :create, :update, :destroy]
+    resources :medication_administrations, only: [:index, :create, :update, :destroy]
     resource  :hospitalization, only: [:show, :create, :update] do
       member do
         post :discharge
@@ -114,6 +115,11 @@ Rails.application.routes.draw do
     end
   end
   resources :lab_parameter_groups, only: [:index, :create, :update, :destroy] do
+    member do
+      put :restore
+    end
+  end
+  resources :clinical_study_classifications, only: [:index, :create, :update, :destroy] do
     member do
       put :restore
     end

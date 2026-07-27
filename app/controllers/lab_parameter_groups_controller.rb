@@ -38,7 +38,11 @@ class LabParameterGroupsController < ApplicationController
 
   def destroy
     group = LabParameterGroup.find(params[:id])
-    group.lab_parameters.update_all(is_active: false)
+    active_params = group.lab_parameters.where(is_active: true)
+    if active_params.any?
+      render json: { error: "No se puede suspender el grupo porque tiene #{active_params.count} parámetros activos asociados. Suspenda o reasigne los parámetros primero." }, status: :unprocessable_entity
+      return
+    end
     group.update!(is_active: false)
     UserActivityLog.create!(
       user: @current_user,

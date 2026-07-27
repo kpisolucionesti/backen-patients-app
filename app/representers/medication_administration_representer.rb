@@ -3,6 +3,7 @@ class MedicationAdministrationRepresenter < Representable::Decorator
 
   property :id
   property :hospitalization_id
+  property :emergency_id
   property :medical_plan_id
   property :medication_name
   property :dosage

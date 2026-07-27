@@ -4,10 +4,14 @@ class LabParametersController < ApplicationController
 
   def index
     scope = params[:include_inactive] == 'true' ? LabParameter.ordered : LabParameter.active.ordered
-    params = scope.includes(:lab_parameter_group)
+    scope = scope.by_classification(params[:classification_id]) if params[:classification_id].present?
+    params = scope.includes(:lab_parameter_group, :clinical_study_classification)
     render json: params.as_json(
-      only: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id, :is_active, :created_at, :updated_at],
-      include: { lab_parameter_group: { only: [:id, :name] } }
+      only: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id, :clinical_study_classification_id, :is_active, :created_at, :updated_at],
+      include: {
+        lab_parameter_group: { only: [:id, :name] },
+        clinical_study_classification: { only: [:id, :name, :key, :color] }
+      }
     ), status: :ok
   end
 
@@ -20,8 +24,11 @@ class LabParametersController < ApplicationController
         description: "Creó parámetro de laboratorio '#{param.name}'"
       )
       render json: param.as_json(
-        only: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id, :created_at, :updated_at],
-        include: { lab_parameter_group: { only: [:id, :name] } }
+        only: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id, :clinical_study_classification_id, :created_at, :updated_at],
+        include: {
+          lab_parameter_group: { only: [:id, :name] },
+          clinical_study_classification: { only: [:id, :name, :key, :color] }
+        }
       ), status: :created
     else
       render json: { error: param.errors.full_messages.join(', ') }, status: :unprocessable_entity
@@ -37,8 +44,11 @@ class LabParametersController < ApplicationController
         description: "Actualizó parámetro de laboratorio '#{param.name}'"
       )
       render json: param.as_json(
-        only: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id, :created_at, :updated_at],
-        include: { lab_parameter_group: { only: [:id, :name] } }
+        only: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id, :clinical_study_classification_id, :created_at, :updated_at],
+        include: {
+          lab_parameter_group: { only: [:id, :name] },
+          clinical_study_classification: { only: [:id, :name, :key, :color] }
+        }
       ), status: :ok
     else
       render json: { error: param.errors.full_messages.join(', ') }, status: :unprocessable_entity
@@ -65,8 +75,11 @@ class LabParametersController < ApplicationController
       description: "Restauró parámetro de laboratorio '#{param.name}'"
     )
     render json: param.as_json(
-      only: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id, :is_active, :created_at, :updated_at],
-      include: { lab_parameter_group: { only: [:id, :name] } }
+      only: [:id, :name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id, :clinical_study_classification_id, :is_active, :created_at, :updated_at],
+      include: {
+        lab_parameter_group: { only: [:id, :name] },
+        clinical_study_classification: { only: [:id, :name, :key, :color] }
+      }
     ), status: :ok
   end
 
@@ -84,6 +97,15 @@ class LabParametersController < ApplicationController
         group = LabParameterGroup.find_or_create_by!(name: item[:group_name])
       end
 
+      classification = nil
+      if item[:classification_name].present?
+        classification = ClinicalStudyClassification.find_by('LOWER(name) = ?', item[:classification_name].downcase.strip)
+        unless classification
+          errors << { row: idx + 1, error: "Clasificación '#{item[:classification_name]}' no encontrada" }
+          next
+        end
+      end
+
       reference_ranges = item[:reference_ranges]
       if reference_ranges.is_a?(String)
         begin
@@ -99,6 +121,7 @@ class LabParametersController < ApplicationController
       param = LabParameter.find_or_initialize_by(name: item[:parameter_name] || item[:name])
       param.assign_attributes(
         lab_parameter_group: group,
+        clinical_study_classification: classification,
         unit: item[:unit],
         abbreviation: item[:abbreviation],
         reference_ranges: reference_ranges || {},
@@ -128,7 +151,7 @@ class LabParametersController < ApplicationController
   private
 
   def param_params
-    params.permit(:name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id, :is_active)
+    params.permit(:name, :unit, :abbreviation, :reference_ranges, :sort_order, :lab_parameter_group_id, :clinical_study_classification_id, :is_active)
   end
 
   def parse_legacy_reference_range(str)

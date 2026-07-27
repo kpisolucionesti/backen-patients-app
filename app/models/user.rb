@@ -61,6 +61,8 @@ class User < ApplicationRecord
     'emergencia.anular', 'emergencia.triage', 'emergencia.discharge',
     'emergencia.assign_room', 'emergencia.cargar_laboratorios',
     'emergencia.modificar_antecedentes', 'emergencia.reportes', 'emergencia.documentos',
+    'evaluaciones.view', 'evaluaciones.create', 'evaluaciones.edit', 'evaluaciones.delete',
+    'planes.view', 'planes.create', 'planes.edit', 'planes.delete',
     'historial.view', 'historial.export',
     'configuraciones.view',
     'pacientes.view', 'pacientes.edit',
@@ -81,6 +83,7 @@ class User < ApplicationRecord
     'uci.view', 'uci.edit', 'uci.nursing',
     'especialidades.view', 'especialidades.create', 'especialidades.edit', 'especialidades.delete',
     'agenda.edit',
+    'enfermeria.view', 'enfermeria.create', 'enfermeria.edit', 'enfermeria.delete',
     'citas.view', 'citas.create', 'citas.edit', 'citas.delete', 'citas.attend',
   ].freeze
 

@@ -44,7 +44,7 @@ class NotesController < ApplicationController
 
     private
     def note_params
-        params.permit(:note, :patient_id, :emergency_id)
+        params.permit(:note, :patient_id, :emergency_id, :note_type)
     end
 
     def set_note

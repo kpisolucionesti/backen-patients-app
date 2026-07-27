@@ -1,5 +1,6 @@
 class MedicationAdministration < ApplicationRecord
-  belongs_to :hospitalization
+  belongs_to :hospitalization, optional: true
+  belongs_to :emergency, optional: true
   belongs_to :medical_plan, optional: true
   belongs_to :administered_by, class_name: 'User', optional: true
 
@@ -9,6 +10,7 @@ class MedicationAdministration < ApplicationRecord
   validates :route, length: { maximum: 255 }, allow_blank: true
   validates :frequency, length: { maximum: 255 }, allow_blank: true
   validates :notes, length: { maximum: 2000 }, allow_blank: true
+  validate :parent_presence
 
   STATUS_LABELS = {
     scheduled: 'Programado',
@@ -34,5 +36,13 @@ class MedicationAdministration < ApplicationRecord
 
   def route_label
     ROUTE_LABELS[route.to_sym] || route
+  end
+
+  private
+
+  def parent_presence
+    unless hospitalization_id.present? || emergency_id.present?
+      errors.add(:base, 'Debe estar asociado a una hospitalización o emergencia')
+    end
   end
 end

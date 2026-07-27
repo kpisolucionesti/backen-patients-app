@@ -1,19 +1,19 @@
 class MedicationAdministrationsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_hospitalization
+  before_action :set_parent
   before_action :set_administration, only: [:update, :destroy]
 
   def index
     authorize!('hospitalizacion.view')
-    administrations = @hospitalization.medication_administrations
-                                      .includes(:administered_by, :medical_plan)
-                                      .order(scheduled_at: :desc)
+    administrations = @parent.medication_administrations
+                              .includes(:administered_by, :medical_plan)
+                              .order(scheduled_at: :desc)
     render json: ::MedicationAdministrationRepresenter.for_collection.new(administrations), status: :ok
   end
 
   def create
     authorize!('hospitalizacion.nursing')
-    administration = @hospitalization.medication_administrations.new(admin_params)
+    administration = @parent.medication_administrations.new(admin_params)
     administration.administered_by = @current_user if params[:administered_at].present?
 
     if administration.save
@@ -43,12 +43,18 @@ class MedicationAdministrationsController < ApplicationController
 
   private
 
-  def set_hospitalization
-    @hospitalization = Hospitalization.find(params[:hospitalization_id])
+  def set_parent
+    if params[:hospitalization_id].present?
+      @parent = Hospitalization.find(params[:hospitalization_id])
+    elsif params[:emergency_id].present?
+      @parent = Emergency.find(params[:emergency_id])
+    else
+      render json: { error: 'hospitalization_id o emergency_id requerido' }, status: :unprocessable_entity
+    end
   end
 
   def set_administration
-    @administration = @hospitalization.medication_administrations.find(params[:id])
+    @administration = @parent.medication_administrations.find(params[:id])
   end
 
   def admin_params

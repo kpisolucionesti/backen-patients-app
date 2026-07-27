@@ -9,6 +9,8 @@ class HospitalizationRepresenter < Representable::Decorator
   property :admission_diagnosis
   property :discharge_diagnosis
   property :discharge_summary
+  property :current_diagnosis
+  property :final_diagnosis
   property :admission_date
   property :discharge_date
   property :status

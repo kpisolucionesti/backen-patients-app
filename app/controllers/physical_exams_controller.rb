@@ -6,13 +6,18 @@ class PhysicalExamsController < ApplicationController
 
   def index
     authorize!('emergencia.view')
-    exam = @emergency.physical_exam
+    doctor_id = @current_user.doctor_id
+    exam = @emergency.physical_exams.find_or_initialize_by(doctor_id: doctor_id) if doctor_id
+    exam ||= @emergency.physical_exams.first
     render json: exam || {}, status: :ok
   end
 
   def create
     authorize!('emergencia.edit')
-    exam = @emergency.build_physical_exam(exam_params)
+    doctor_id = @current_user.doctor_id
+    exam = @emergency.physical_exams.find_or_initialize_by(doctor_id: doctor_id)
+    exam.assign_attributes(exam_params)
+    exam.doctor_id = doctor_id if doctor_id
     if exam.save
       UserActivityLog.create!(
         user: @current_user,
@@ -27,7 +32,12 @@ class PhysicalExamsController < ApplicationController
 
   def update
     authorize!('emergencia.edit')
-    exam = @emergency.physical_exam
+    doctor_id = @current_user.doctor_id
+    exam = @emergency.physical_exams.find_by(doctor_id: doctor_id)
+    unless exam
+      render json: { error: 'Examen no encontrado' }, status: :not_found
+      return
+    end
     if exam.update(exam_params)
       UserActivityLog.create!(
         user: @current_user,

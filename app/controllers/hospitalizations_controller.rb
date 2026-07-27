@@ -139,6 +139,6 @@ class HospitalizationsController < ApplicationController
   private
 
   def hospitalization_params
-    params.permit(:room_id, :admitting_doctor_id, :attending_doctor_id, :admission_diagnosis, :discharge_diagnosis, :discharge_summary, :admission_date, :discharge_date, :status)
+    params.permit(:room_id, :admitting_doctor_id, :attending_doctor_id, :admission_diagnosis, :discharge_diagnosis, :discharge_summary, :admission_date, :discharge_date, :status, :current_diagnosis, :final_diagnosis)
   end
 end

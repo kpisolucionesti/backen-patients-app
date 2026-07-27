@@ -60,6 +60,6 @@ class EvaluationsController < ApplicationController
   end
 
   def evaluation_params
-    params.permit(:doctor_id, :diagnostic_impression, :plan)
+    params.permit(:doctor_id, :diagnostic_impression, :plan, :current_illness, :suggestions)
   end
 end

@@ -15,6 +15,8 @@ class Hospitalization < ApplicationRecord
   validates :admission_diagnosis, length: { maximum: 2000 }, allow_blank: true
   validates :discharge_diagnosis, length: { maximum: 2000 }, allow_blank: true
   validates :discharge_summary, length: { maximum: 5000 }, allow_blank: true
+  validates :current_diagnosis, length: { maximum: 2000 }, allow_blank: true
+  validates :final_diagnosis, length: { maximum: 2000 }, allow_blank: true
 
   scope :active, -> { where(status: 'active') }
 

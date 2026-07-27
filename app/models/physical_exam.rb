@@ -1,5 +1,6 @@
 class PhysicalExam < ApplicationRecord
   belongs_to :emergency
+  belongs_to :doctor, optional: true
 
   validates :emergency, presence: true
   validates :cabeza, length: { maximum: 5000 }, allow_blank: true

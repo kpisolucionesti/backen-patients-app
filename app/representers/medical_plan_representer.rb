@@ -17,6 +17,7 @@ class MedicalPlanRepresenter < Representable::Decorator
   end
 
   property :created_by do
+    property :id
     property :name
   end
 end

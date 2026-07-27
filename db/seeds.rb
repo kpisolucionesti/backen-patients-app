@@ -149,3 +149,29 @@ end
 medicos.each do |i|
     Doctor.create!(name: i[:name], specialty: specialties[i[:specialty]])
 end
+
+ClinicalStudyClassification.find_or_create_by!(key: 'lab') do |c|
+  c.name = 'Laboratorio'
+  c.color = '#1565c0'
+  c.sort_order = 1
+end
+ClinicalStudyClassification.find_or_create_by!(key: 'xray') do |c|
+  c.name = 'Radiografía'
+  c.color = '#6a1b9a'
+  c.sort_order = 2
+end
+ClinicalStudyClassification.find_or_create_by!(key: 'eco') do |c|
+  c.name = 'Ecosonograma'
+  c.color = '#ff8f00'
+  c.sort_order = 3
+end
+ClinicalStudyClassification.find_or_create_by!(key: 'ct') do |c|
+  c.name = 'Tomografía'
+  c.color = '#2e7d32'
+  c.sort_order = 4
+end
+ClinicalStudyClassification.find_or_create_by!(key: 'mri') do |c|
+  c.name = 'Resonancia Magnética'
+  c.color = '#c62828'
+  c.sort_order = 5
+end

@@ -25,13 +25,29 @@ groups:
       - key: emergencia.documentos
         label: Gestionar Documentos
 
-  - section: Historial
-    color: '#fff3e0'
+  - section: Evaluaciones
+    color: '#e8eaf6'
     permissions:
-      - key: historial.view
+      - key: evaluaciones.view
         label: Ver
-      - key: historial.export
-        label: Exportar
+      - key: evaluaciones.create
+        label: Crear
+      - key: evaluaciones.edit
+        label: Editar
+      - key: evaluaciones.delete
+        label: Eliminar
+
+  - section: Planes
+    color: '#f3e5f5'
+    permissions:
+      - key: planes.view
+        label: Ver
+      - key: planes.create
+        label: Crear
+      - key: planes.edit
+        label: Editar
+      - key: planes.delete
+        label: Eliminar
 
   - section: Configuraciones
     color: '#e8f5e9'
@@ -194,6 +210,18 @@ groups:
     permissions:
       - key: agenda.edit
         label: Editar
+
+  - section: Enfermería
+    color: '#fce4ec'
+    permissions:
+      - key: enfermeria.view
+        label: Ver
+      - key: enfermeria.create
+        label: Crear
+      - key: enfermeria.edit
+        label: Editar
+      - key: enfermeria.delete
+        label: Eliminar
 
   - section: Citas
     color: '#e3f2fd'
