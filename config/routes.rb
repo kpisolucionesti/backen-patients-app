@@ -63,7 +63,7 @@ Rails.application.routes.draw do
 
   resources :surgery_team_members, only: [:create, :destroy]
 
-  resources :documents, only: [:index, :create, :destroy]
+  resources :documents, only: [:index, :create, :update, :destroy]
 
   namespace :quirofanos do
     get :schedule, to: 'dashboard#schedule'
@@ -176,6 +176,9 @@ Rails.application.routes.draw do
 
   get 'emergencies/:emergency_id/medical_history', to: 'medical_history#for_emergency'
   get 'hospitalizations/:hospitalization_id/medical_history', to: 'medical_history#for_hospitalization'
+
+  get  '/dynamic_settings', to: 'dynamic_settings#show'
+  patch '/dynamic_settings', to: 'dynamic_settings#update'
 
   resources :notifications, only: [:index] do
     member do

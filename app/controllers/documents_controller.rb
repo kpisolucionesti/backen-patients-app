@@ -13,7 +13,11 @@ class DocumentsController < ApplicationController
       records = Document.where(
         attachable_type: params[:attachable_type],
         attachable_id: params[:attachable_id]
-      ).order(created_at: :desc)
+      )
+      if params[:study_classification_id].present?
+        records = records.where(study_classification_id: params[:study_classification_id])
+      end
+      records = records.order(created_at: :desc)
       render json: ::DocumentRepresenter.for_collection.new(records), status: :ok
     else
       render json: { error: 'attachable_type y attachable_id son requeridos' }, status: :unprocessable_entity
@@ -39,6 +43,16 @@ class DocumentsController < ApplicationController
     head :no_content
   end
 
+  def update
+    document = Document.find(params[:id])
+    authorize_document_action!(document.attachable_type)
+    if document.update(document_params)
+      render json: ::DocumentRepresenter.new(document), status: :ok
+    else
+      render json: { error: document.errors.full_messages.join(', ') }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def authorize_document_action!(attachable_type)
@@ -47,7 +61,10 @@ class DocumentsController < ApplicationController
   end
 
   def document_params
-    permitted = params.permit(:attachable_type, :attachable_id, :description, :file_type, :report_type, :file, :metadata)
+    permitted = params.permit(
+      :attachable_type, :attachable_id, :description, :file_type, :report_type, :file, :metadata,
+      :study_classification_id, :study_type, :observations, :status
+    )
     permitted[:metadata] = JSON.parse(permitted[:metadata]) if permitted[:metadata].is_a?(String)
     permitted
   end

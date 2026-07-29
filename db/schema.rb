@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_01_000000) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_02_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -186,8 +186,28 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_01_000000) do
     t.datetime "updated_at", null: false
     t.string "report_type"
     t.jsonb "metadata", default: {}
+    t.string "order_number"
+    t.bigint "study_classification_id"
+    t.string "study_type"
+    t.text "observations"
+    t.string "status", default: "requested"
     t.index ["attachable_type", "attachable_id"], name: "idx_documents_on_attachable"
+    t.index ["order_number"], name: "index_documents_on_order_number", unique: true
+    t.index ["status"], name: "index_documents_on_status"
+    t.index ["study_classification_id"], name: "index_documents_on_study_classification_id"
     t.index ["uploaded_by_id"], name: "index_documents_on_uploaded_by_id"
+  end
+
+  create_table "dynamic_settings", force: :cascade do |t|
+    t.bigint "company_id"
+    t.string "category", default: "general", null: false
+    t.jsonb "settings_data", default: {}, null: false
+    t.jsonb "schema_definition", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_dynamic_settings_on_category"
+    t.index ["company_id", "category"], name: "idx_dynamic_settings_company_category", unique: true
+    t.index ["company_id"], name: "index_dynamic_settings_on_company_id"
   end
 
   create_table "email_settings", force: :cascade do |t|
@@ -217,11 +237,11 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_01_000000) do
     t.datetime "egress_at"
     t.string "classification"
     t.text "cause_of_death"
+    t.string "final_diagnostic", limit: 2000
     t.text "reason_for_consultation"
     t.text "current_illness"
     t.text "discharge_note"
     t.text "admission_note"
-    t.string "final_diagnostic", limit: 2000
     t.index ["created_at"], name: "index_emergencies_on_created_at"
     t.index ["created_by_id"], name: "index_emergencies_on_created_by_id"
     t.index ["egress_at"], name: "index_emergencies_on_egress_at"
@@ -259,8 +279,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_01_000000) do
     t.bigint "created_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "current_illness"
     t.text "suggestions"
+    t.text "current_illness"
     t.index ["created_by_id"], name: "index_evaluations_on_created_by_id"
     t.index ["doctor_id"], name: "index_evaluations_on_doctor_id"
     t.index ["emergency_id", "doctor_id"], name: "index_evaluations_on_emergency_id_and_doctor_id"
@@ -365,8 +385,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_01_000000) do
     t.datetime "updated_at", null: false
     t.string "abbreviation"
     t.jsonb "reference_ranges", default: {}
-    t.boolean "is_active", default: true, null: false
     t.bigint "clinical_study_classification_id"
+    t.boolean "is_active", default: true, null: false
     t.index ["clinical_study_classification_id"], name: "index_lab_parameters_on_clinical_study_classification_id"
     t.index ["lab_parameter_group_id"], name: "index_lab_parameters_on_lab_parameter_group_id"
   end
@@ -789,6 +809,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_01_000000) do
   add_foreign_key "appointments", "users", column: "created_by_id"
   add_foreign_key "doctor_schedules", "doctors"
   add_foreign_key "doctors", "specialties"
+  add_foreign_key "documents", "clinical_study_classifications", column: "study_classification_id"
   add_foreign_key "documents", "users", column: "uploaded_by_id"
   add_foreign_key "emergencies", "patients"
   add_foreign_key "emergencies", "users", column: "created_by_id"

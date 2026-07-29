@@ -20,5 +20,6 @@ module App
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.active_job.queue_adapter = :sidekiq
+    config.eager_load_paths << Rails.root.join('app', 'domain')
   end
 end
