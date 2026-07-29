@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "theme_mode": {
+      "type": "string",
+      "enum": ["light", "dark", "system"],
+      "default": "system",
+      "ui": {
+        "label": "Tema predeterminado",
+        "group": "Apariencia",
+        "control": "select",
+        "options": [
+          { "value": "light", "label": "Claro" },
+          { "value": "dark", "label": "Oscuro" },
+          { "value": "system", "label": "Sistema" }
+        ]
+      }
+    },
+    "compact_mode": {
+      "type": "boolean",
+      "default": false,
+      "ui": { "label": "Modo compacto", "group": "Apariencia", "hint": "Reduce el espaciado en tablas y formularios" }
+    },
+    "export_excel_enabled": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Permitir exportar Excel", "group": "Exportacion" }
+    },
+    "export_pdf_enabled": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Permitir exportar PDF", "group": "Exportacion" }
+    },
+    "include_logo_in_exports": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Incluir logo en reportes", "group": "Exportacion" }
+    }
+  }
+}

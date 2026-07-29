@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "password_min_length": {
+      "type": "integer",
+      "minimum": 6,
+      "maximum": 32,
+      "default": 8,
+      "ui": { "label": "Longitud minima de contrasena", "group": "Politica de Contrasenas", "hint": "6-32 caracteres" }
+    },
+    "password_require_uppercase": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Exigir mayuscula", "group": "Politica de Contrasenas" }
+    },
+    "password_require_lowercase": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Exigir minuscula", "group": "Politica de Contrasenas" }
+    },
+    "password_require_number": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Exigir numero", "group": "Politica de Contrasenas" }
+    },
+    "password_require_special_char": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Exigir caracter especial", "group": "Politica de Contrasenas" }
+    },
+    "password_expiry_days": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 365,
+      "default": 0,
+      "ui": { "label": "Caducidad de contrasena (dias)", "group": "Politica de Contrasenas", "hint": "0 = sin caducidad" }
+    },
+    "max_failed_attempts": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 20,
+      "default": 5,
+      "ui": { "label": "Maximo de intentos fallidos", "group": "Bloqueo de Cuenta" }
+    },
+    "lockout_duration_minutes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1440,
+      "default": 30,
+      "ui": { "label": "Duracion del bloqueo (minutos)", "group": "Bloqueo de Cuenta" }
+    },
+    "idle_timeout_minutes": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 120,
+      "default": 15,
+      "ui": { "label": "Tiempo de inactividad (min)", "group": "Sesion", "hint": "5-120 minutos" }
+    },
+    "allow_concurrent_sessions": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Permitir sesiones concurrentes", "group": "Sesion" }
+    },
+    "require_2fa": {
+      "type": "boolean",
+      "default": false,
+      "ui": { "label": "Requerir autenticacion de 2 factores (2FA)", "group": "Seguridad Avanzada" }
+    },
+    "ip_restriction_enabled": {
+      "type": "boolean",
+      "default": false,
+      "ui": { "label": "Restriccion por IP habilitada", "group": "Seguridad Avanzada" }
+    },
+    "allowed_ips": {
+      "type": "string",
+      "default": "",
+      "ui": { "label": "IPs permitidas (whitelist)", "group": "Seguridad Avanzada", "hint": "Una por linea", "control": "textarea" }
+    },
+    "blocked_ips": {
+      "type": "string",
+      "default": "",
+      "ui": { "label": "IPs bloqueadas (blacklist)", "group": "Seguridad Avanzada", "hint": "Una por linea", "control": "textarea" }
+    }
+  }
+}

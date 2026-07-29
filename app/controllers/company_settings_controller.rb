@@ -1,6 +1,11 @@
 class CompanySettingsController < ApplicationController
-  before_action :authenticate_user!
-  before_action :require_admin!
+  before_action :authenticate_user!, except: [:public_info]
+  before_action :require_admin!, except: [:public_info]
+
+  def public_info
+    settings = CompanySetting.first_or_initialize
+    render json: { company_name: settings.company_name, logo_url: settings.logo.attached? ? url_for(settings.logo) : nil }
+  end
 
   def show
     settings = CompanySetting.first_or_initialize

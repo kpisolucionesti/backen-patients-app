@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "timezone": {
+      "type": "string",
+      "enum": ["America/Montevideo", "America/Caracas", "America/Bogota", "America/Lima", "America/Santiago", "America/Buenos_Aires", "America/Mexico_City", "America/Panama", "America/Guatemala", "America/Tegucigalpa", "America/El_Salvador", "America/Managua", "America/Costa_Rica", "America/Santo_Domingo", "America/La_Paz", "America/Asuncion"],
+      "default": "America/Montevideo",
+      "ui": {
+        "label": "Zona horaria",
+        "group": "Regional",
+        "control": "select",
+        "options": [
+          { "value": "America/Montevideo", "label": "Uruguay (GMT-3)" },
+          { "value": "America/Caracas", "label": "Venezuela (GMT-4)" },
+          { "value": "America/Bogota", "label": "Colombia (GMT-5)" },
+          { "value": "America/Lima", "label": "Peru (GMT-5)" },
+          { "value": "America/Santiago", "label": "Chile (GMT-4/-3)" },
+          { "value": "America/Buenos_Aires", "label": "Argentina (GMT-3)" },
+          { "value": "America/Mexico_City", "label": "Mexico (GMT-6)" },
+          { "value": "America/Panama", "label": "Panama (GMT-5)" },
+          { "value": "America/Guatemala", "label": "Guatemala (GMT-6)" }
+        ]
+      }
+    },
+    "date_format": {
+      "type": "string",
+      "enum": ["dd/MM/yyyy", "MM/dd/yyyy", "yyyy-MM-dd"],
+      "default": "dd/MM/yyyy",
+      "ui": {
+        "label": "Formato de fecha",
+        "group": "Regional",
+        "control": "select",
+        "options": [
+          { "value": "dd/MM/yyyy", "label": "dd/MM/yyyy" },
+          { "value": "MM/dd/yyyy", "label": "MM/dd/yyyy" },
+          { "value": "yyyy-MM-dd", "label": "yyyy-MM-dd (ISO)" }
+        ]
+      }
+    },
+    "time_format": {
+      "type": "string",
+      "enum": ["HH:mm", "hh:mm a"],
+      "default": "HH:mm",
+      "ui": {
+        "label": "Formato de hora",
+        "group": "Regional",
+        "control": "select",
+        "options": [
+          { "value": "HH:mm", "label": "24 horas (HH:mm)" },
+          { "value": "hh:mm a", "label": "12 horas (hh:mm AM/PM)" }
+        ]
+      }
+    },
+    "locale": {
+      "type": "string",
+      "enum": ["es", "en"],
+      "default": "es",
+      "ui": {
+        "label": "Idioma",
+        "group": "Regional",
+        "control": "select",
+        "options": [
+          { "value": "es", "label": "Espanol" },
+          { "value": "en", "label": "English" }
+        ]
+      }
+    },
+    "default_page_size": {
+      "type": "integer",
+      "minimum": 10,
+      "maximum": 100,
+      "default": 25,
+      "ui": { "label": "Registros por pagina", "group": "Regional", "hint": "10-100" }
+    }
+  }
+}

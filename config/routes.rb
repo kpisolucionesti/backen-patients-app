@@ -131,7 +131,9 @@ Rails.application.routes.draw do
     post :test
   end
 
-  resource :company_settings, only: [:show, :update]
+  resource :company_settings, only: [:show, :update] do
+    get :public_info, on: :collection
+  end
   resource :storage_configurations, only: [:show, :update]
   resource :password_policies, only: [:show, :update]
   resource :session_settings, only: [:show, :update]
@@ -179,6 +181,7 @@ Rails.application.routes.draw do
 
   get  '/dynamic_settings', to: 'dynamic_settings#show'
   patch '/dynamic_settings', to: 'dynamic_settings#update'
+  get  '/dynamic_settings/categories', to: 'dynamic_settings#categories'
 
   resources :notifications, only: [:index] do
     member do
@@ -188,4 +191,37 @@ Rails.application.routes.draw do
       put :mark_all_read
     end
   end
+
+  resources :medication_routes, only: [:index, :show, :create, :update, :destroy]
+  resources :medications, only: [:index, :show, :create, :update, :destroy]
+  resources :diagnoses, only: [:index, :show, :create, :update, :destroy]
+  resources :allergens, only: [:index, :show, :create, :update, :destroy]
+  resources :surgery_procedures, only: [:index, :show, :create, :update, :destroy]
+  resources :anesthesia_types, only: [:index, :show, :create, :update, :destroy]
+  resources :discharge_types, only: [:index, :show, :create, :update, :destroy]
+  resources :vital_signs_ranges, only: [:index, :show, :create, :update, :destroy]
+
+  resources :email_templates, only: [:index, :show, :create, :update, :destroy] do
+    member do
+      post :preview
+    end
+  end
+
+  resources :api_keys, only: [:index, :show, :create, :update, :destroy] do
+    member do
+      post :regenerate
+    end
+  end
+
+  resources :webhooks, only: [:index, :show, :create, :update, :destroy] do
+    member do
+      post :test
+    end
+    resources :deliveries, only: [:index], controller: 'webhooks', action: :deliveries
+  end
+
+  resources :medication_presentations, only: [:index, :show, :create, :update, :destroy]
+  resources :medication_concentrations, only: [:index, :show, :create, :update, :destroy]
+  resources :allergen_categories, only: [:index, :show, :create, :update, :destroy]
+  resources :surgery_categories, only: [:index, :show, :create, :update, :destroy]
 end

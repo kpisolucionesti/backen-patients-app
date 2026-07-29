@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "notifications_enabled": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Notificaciones activas", "group": "General" }
+    },
+    "email_notifications": {
+      "type": "boolean",
+      "default": false,
+      "ui": { "label": "Notificaciones por correo", "group": "Canales" }
+    },
+    "notify_emergency_created": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Nueva emergencia creada", "group": "Eventos" }
+    },
+    "notify_patient_discharged": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Paciente dado de alta", "group": "Eventos" }
+    },
+    "notify_patient_death": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Fallecimiento de paciente", "group": "Eventos" }
+    },
+    "notify_hospitalization_admission": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Ingreso a hospitalizacion", "group": "Eventos" }
+    },
+    "notify_hospitalization_discharge": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Alta hospitalaria", "group": "Eventos" }
+    },
+    "notify_surgery_scheduled": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Cirugia programada", "group": "Eventos" }
+    },
+    "notify_interconsultation": {
+      "type": "boolean",
+      "default": true,
+      "ui": { "label": "Interconsulta solicitada", "group": "Eventos" }
+    }
+  }
+}
