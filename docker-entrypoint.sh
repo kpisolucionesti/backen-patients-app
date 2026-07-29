@@ -7,11 +7,6 @@ done
 
 rails db:migrate
 
-if [ "$(rails runner "puts Patient.count" 2>/dev/null)" = "0" ]; then
-  echo ">> Importando datos legacy..."
-  rails import_legacy_data:import
-else
-  echo ">> Datos legacy ya importados, saltando..."
-fi
+rails db:seed 2>/dev/null || echo "Seed skipped (already seeded or error)"
 
 exec "$@"

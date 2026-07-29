@@ -19,17 +19,17 @@ admin_permissions = [
   'quirofano.view', 'quirofano.edit',
 ]
 
-Profile.find_or_create_by!(name: 'Administrador') do |p|
+Profile.find_or_create_by(name: 'Administrador') do |p|
   p.description = 'Acceso completo a todos los modulos'
   p.permissions = admin_permissions + ['areas.view', 'areas.create', 'areas.edit', 'areas.delete', 'rooms.create', 'rooms.edit', 'rooms.delete']
 end
 
-Profile.find_or_create_by!(name: 'User') do |p|
+Profile.find_or_create_by(name: 'User') do |p|
   p.description = 'Acceso basico a visualizar emergencias e historial'
   p.permissions = ['emergencia.view', 'emergencia.create', 'emergencia.assign_room', 'historial.view', 'pacientes.view', 'pacientes.edit']
 end
 
-User.find_or_create_by!(email: 'admin@emerboard.com') do |u|
+User.find_or_create_by(email: 'admin@emerboard.com') do |u|
   u.username = 'admin'
   u.password = 'Admin123456!'
   u.password_confirmation = 'Admin123456!'
@@ -39,17 +39,17 @@ User.find_or_create_by!(email: 'admin@emerboard.com') do |u|
   u.confirmed_at = Time.current
 end
 
-ClinicalStudyClassification.find_or_create_by!(key: 'laboratorios') do |c|
+ClinicalStudyClassification.find_or_create_by(key: 'laboratorios') do |c|
   c.name = 'Laboratorios'
   c.color = '#1565c0'
   c.sort_order = 10
 end
-ClinicalStudyClassification.find_or_create_by!(key: 'imagenologia') do |c|
+ClinicalStudyClassification.find_or_create_by(key: 'imagenologia') do |c|
   c.name = 'Imagenologia'
   c.color = '#7b1fa2'
   c.sort_order = 11
 end
-ClinicalStudyClassification.find_or_create_by!(key: 'banco_sangre') do |c|
+ClinicalStudyClassification.find_or_create_by(key: 'banco_sangre') do |c|
   c.name = 'Banco de Sangre'
   c.color = '#c62828'
   c.sort_order = 12
