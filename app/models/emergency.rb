@@ -25,6 +25,8 @@ class Emergency < ApplicationRecord
   has_many :evaluations, dependent: :destroy
   has_many :recipes, dependent: :destroy
   has_many :medication_administrations, dependent: :destroy
+  has_one :birth_record_as_mother, class_name: 'BirthRecord', foreign_key: :mother_emergency_id, dependent: :destroy
+  has_one :birth_record_as_baby, class_name: 'BirthRecord', foreign_key: :baby_emergency_id, dependent: :destroy
 
   validates :patient, presence: true
   validates :status, inclusion: { in: VALID_STATUSES }, allow_nil: true

@@ -12,6 +12,8 @@ class PatientRepresenter < Representable::Decorator
     property :representante_ci
     property :last_visit_date
     property :disabled
+    property :patient_category
+    property :mother_id
 
     collection :allergies, decorator: PatientAllergyRepresenter
     collection :antecedents, decorator: PatientAntecedentRepresenter

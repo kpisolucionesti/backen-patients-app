@@ -1,5 +1,6 @@
 class Patient < ApplicationRecord
   GENDERS = %w[M F O].freeze
+  PATIENT_CATEGORIES = %w[adulto pediatrico recien_nacido].freeze
 
   has_many :emergencies, dependent: :destroy
   has_many :notes, dependent: :destroy
@@ -17,11 +18,14 @@ class Patient < ApplicationRecord
   end
   has_many :surgeries, dependent: :destroy
   belongs_to :created_by, class_name: 'User', optional: true
+  belongs_to :mother, class_name: 'Patient', optional: true
+  has_many :children, class_name: 'Patient', foreign_key: :mother_id, dependent: :nullify
 
   validates :ci, uniqueness: true, allow_nil: true
   validates :name, presence: true
   validates :lastname, presence: true
   validates :gender, inclusion: { in: GENDERS }, allow_nil: true
+  validates :patient_category, inclusion: { in: PATIENT_CATEGORIES }
   validates :birthday, presence: true
   validates :medical_history_number, presence: true, uniqueness: true
   validates :representante_ci, length: { maximum: 20 }, allow_blank: true

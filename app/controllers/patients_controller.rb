@@ -62,6 +62,12 @@ class PatientsController < ApplicationController
         render json: patient.stats, status: :ok
     end
 
+    def children
+        authorize!('pacientes.view')
+        patient = Patient.find(params[:id])
+        render json: PatientRepresenter.for_collection.new(patient.children.order(:name)), status: :ok
+    end
+
     def update
         authorize!('pacientes.edit')
         if @patient.disabled?

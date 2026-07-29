@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     end
     member do
       get :stats
+      get :children
     end
     resources :allergies, controller: 'patient_allergies', only: [:index, :create, :update, :destroy]
     resources :antecedents, controller: 'patient_antecedents', only: [:index, :create, :update, :destroy]
@@ -180,6 +181,8 @@ Rails.application.routes.draw do
   get  '/dynamic_settings', to: 'dynamic_settings#show'
   patch '/dynamic_settings', to: 'dynamic_settings#update'
 
+  resources :birth_records, only: [:create]
+
   resources :notifications, only: [:index] do
     member do
       put :mark_read
@@ -188,4 +191,18 @@ Rails.application.routes.draw do
       put :mark_all_read
     end
   end
+
+  # Catalogos Clinicos
+  resources :medication_routes, only: [:index, :create, :update, :destroy]
+  resources :medication_presentations, only: [:index, :create, :update, :destroy]
+  resources :medication_concentrations, only: [:index, :create, :update, :destroy]
+  resources :medications, only: [:index, :create, :update, :destroy]
+  resources :diagnoses, only: [:index, :create, :update, :destroy]
+  resources :allergen_categories, only: [:index, :create, :update, :destroy]
+  resources :allergens, only: [:index, :create, :update, :destroy]
+  resources :surgery_categories, only: [:index, :create, :update, :destroy]
+  resources :surgery_procedures, only: [:index, :create, :update, :destroy]
+  resources :anesthesia_types, only: [:index, :create, :update, :destroy]
+  resources :discharge_types, only: [:index, :create, :update, :destroy]
+  resources :vital_signs_ranges, only: [:index, :create, :update, :destroy]
 end

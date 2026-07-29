@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_02_000001) do
+ActiveRecord::Schema[7.0].define(version: 2026_10_01_000004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -49,6 +49,25 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_02_000001) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "allergen_categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "allergens", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "category"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "anesthesia_types", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "appointment_displays", force: :cascade do |t|
@@ -122,6 +141,31 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_02_000001) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "birth_records", force: :cascade do |t|
+    t.bigint "mother_patient_id", null: false
+    t.bigint "baby_patient_id", null: false
+    t.bigint "mother_emergency_id", null: false
+    t.bigint "baby_emergency_id", null: false
+    t.datetime "birth_date", null: false
+    t.string "birth_type", null: false
+    t.integer "gestational_age_weeks"
+    t.decimal "birth_weight_grams", precision: 10, scale: 2
+    t.integer "apgar_1min"
+    t.integer "apgar_5min"
+    t.integer "birth_order", default: 1
+    t.text "complications"
+    t.text "observations"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "doctor_id"
+    t.index ["baby_emergency_id"], name: "index_birth_records_on_baby_emergency_id"
+    t.index ["baby_patient_id"], name: "index_birth_records_on_baby_patient_id"
+    t.index ["birth_order"], name: "index_birth_records_on_birth_order"
+    t.index ["doctor_id"], name: "index_birth_records_on_doctor_id"
+    t.index ["mother_emergency_id"], name: "index_birth_records_on_mother_emergency_id"
+    t.index ["mother_patient_id"], name: "index_birth_records_on_mother_patient_id"
+  end
+
   create_table "clinical_study_classifications", force: :cascade do |t|
     t.string "name", null: false
     t.string "key", null: false
@@ -143,6 +187,21 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_02_000001) do
     t.string "phone"
     t.string "email"
     t.string "website"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "diagnoses", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "description", null: false
+    t.string "category"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "discharge_types", force: :cascade do |t|
+    t.string "name", null: false
+    t.boolean "requires_cause_of_death", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -451,6 +510,34 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_02_000001) do
     t.index ["status"], name: "index_medication_administrations_on_status"
   end
 
+  create_table "medication_concentrations", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "medication_presentations", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "medication_routes", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "medications", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "generic_name"
+    t.string "presentation"
+    t.string "concentration"
+    t.string "medication_route"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "notes", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -566,10 +653,13 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_02_000001) do
     t.bigint "created_by_id"
     t.boolean "disabled", default: false
     t.string "medical_history_number", null: false
+    t.bigint "mother_id"
+    t.string "patient_category", default: "adulto", null: false
     t.index ["ci"], name: "index_patients_on_ci", unique: true
     t.index ["created_by_id"], name: "index_patients_on_created_by_id"
     t.index ["lastname"], name: "index_patients_on_lastname"
     t.index ["medical_history_number"], name: "index_patients_on_medical_history_number", unique: true
+    t.index ["mother_id"], name: "index_patients_on_mother_id"
     t.index ["name"], name: "index_patients_on_name"
   end
 
@@ -681,6 +771,20 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_02_000001) do
     t.index ["area_id"], name: "index_surgeries_on_area_id"
     t.index ["hospitalization_id"], name: "index_surgeries_on_hospitalization_id"
     t.index ["patient_id"], name: "index_surgeries_on_patient_id"
+  end
+
+  create_table "surgery_categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "surgery_procedures", force: :cascade do |t|
+    t.string "code"
+    t.string "name", null: false
+    t.string "category"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "surgery_team_members", force: :cascade do |t|
@@ -798,6 +902,19 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_02_000001) do
     t.index ["recorded_by_id"], name: "index_vital_signs_on_recorded_by_id"
   end
 
+  create_table "vital_signs_ranges", force: :cascade do |t|
+    t.string "parameter", null: false
+    t.string "sex"
+    t.integer "age_min"
+    t.integer "age_max"
+    t.decimal "min_normal", precision: 10, scale: 2
+    t.decimal "max_normal", precision: 10, scale: 2
+    t.decimal "min_alert", precision: 10, scale: 2
+    t.decimal "max_alert", precision: 10, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "appointment_displays", "specialties"
@@ -807,6 +924,11 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_02_000001) do
   add_foreign_key "appointments", "patients"
   add_foreign_key "appointments", "specialties"
   add_foreign_key "appointments", "users", column: "created_by_id"
+  add_foreign_key "birth_records", "doctors"
+  add_foreign_key "birth_records", "emergencies", column: "baby_emergency_id"
+  add_foreign_key "birth_records", "emergencies", column: "mother_emergency_id"
+  add_foreign_key "birth_records", "patients", column: "baby_patient_id"
+  add_foreign_key "birth_records", "patients", column: "mother_patient_id"
   add_foreign_key "doctor_schedules", "doctors"
   add_foreign_key "doctors", "specialties"
   add_foreign_key "documents", "clinical_study_classifications", column: "study_classification_id"
@@ -848,6 +970,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_02_000001) do
   add_foreign_key "patient_family_antecedents", "patients"
   add_foreign_key "patient_gynecological_histories", "patients"
   add_foreign_key "patient_lifestyle_habits", "patients"
+  add_foreign_key "patients", "patients", column: "mother_id"
   add_foreign_key "patients", "users", column: "created_by_id"
   add_foreign_key "physical_exams", "doctors"
   add_foreign_key "physical_exams", "emergencies"
