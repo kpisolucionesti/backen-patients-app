@@ -64,7 +64,11 @@ Rails.application.routes.draw do
 
   resources :surgery_team_members, only: [:create, :destroy]
 
-  resources :documents, only: [:index, :create, :update, :destroy]
+  resources :documents, only: [:index, :create, :update, :destroy] do
+    member do
+      post :send_email
+    end
+  end
 
   namespace :quirofanos do
     get :schedule, to: 'dashboard#schedule'

@@ -10,7 +10,7 @@ class Document < ApplicationRecord
 
   before_create :generate_order_number, if: -> { study_classification_id.present? }
 
-  validates :file, presence: true
+  validates :file, presence: true, unless: :system_report?
   validates :attachable_type, presence: true
   validates :attachable_id, presence: true
   validate :validate_file_content_type, if: -> { file.attached? }
@@ -21,7 +21,7 @@ class Document < ApplicationRecord
   scope :service_orders, -> { where.not(order_number: nil) }
   scope :by_classification, ->(id) { where(study_classification_id: id) }
 
-  STATUSES = %w[requested completed cancelled].freeze
+  STATUSES = %w[pending in_progress completed delivered cancelled].freeze
 
   def file_url
     Rails.application.routes.url_helpers.rails_blob_url(file, disposition: 'inline', host: ENV.fetch('HOST', 'http://localhost:3100')) if file.attached?
@@ -48,6 +48,10 @@ class Document < ApplicationRecord
 
   def classification_name
     I18n.t("clinical_study_classifications.#{study_classification&.key}", default: study_classification&.name) if study_classification
+  end
+
+  def system_report?
+    report_type.present?
   end
 
   private

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_10_01_000004) do
+ActiveRecord::Schema[7.0].define(version: 2026_10_01_000005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -53,21 +53,40 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_01_000004) do
 
   create_table "allergen_categories", force: :cascade do |t|
     t.string "name", null: false
+    t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_allergen_categories_on_name", unique: true
   end
 
   create_table "allergens", force: :cascade do |t|
     t.string "name", null: false
-    t.string "category"
+    t.string "category", default: "otro"
+    t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_allergens_on_category"
+    t.index ["name"], name: "index_allergens_on_name", unique: true
   end
 
   create_table "anesthesia_types", force: :cascade do |t|
     t.string "name", null: false
+    t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_anesthesia_types_on_name", unique: true
+  end
+
+  create_table "api_keys", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "key", null: false
+    t.jsonb "scopes", default: ["read"]
+    t.datetime "last_used_at"
+    t.datetime "expires_at"
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_api_keys_on_key", unique: true
   end
 
   create_table "appointment_displays", force: :cascade do |t|
@@ -193,17 +212,22 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_01_000004) do
 
   create_table "diagnoses", force: :cascade do |t|
     t.string "code", null: false
-    t.string "description", null: false
+    t.text "description", null: false
     t.string "category"
+    t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_diagnoses_on_category"
+    t.index ["code"], name: "index_diagnoses_on_code", unique: true
   end
 
   create_table "discharge_types", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "requires_cause_of_death", default: false
+    t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_discharge_types_on_name", unique: true
   end
 
   create_table "doctor_schedules", force: :cascade do |t|
@@ -279,6 +303,18 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_01_000004) do
     t.boolean "enable_starttls_auto", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "email_templates", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "subject", null: false
+    t.text "body_html"
+    t.string "template_type", default: "custom"
+    t.jsonb "variables", default: []
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_email_templates_on_name", unique: true
   end
 
   create_table "emergencies", force: :cascade do |t|
@@ -512,20 +548,26 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_01_000004) do
 
   create_table "medication_concentrations", force: :cascade do |t|
     t.string "name", null: false
+    t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_medication_concentrations_on_name", unique: true
   end
 
   create_table "medication_presentations", force: :cascade do |t|
     t.string "name", null: false
+    t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_medication_presentations_on_name", unique: true
   end
 
   create_table "medication_routes", force: :cascade do |t|
     t.string "name", null: false
+    t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_medication_routes_on_name", unique: true
   end
 
   create_table "medications", force: :cascade do |t|
@@ -533,9 +575,13 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_01_000004) do
     t.string "generic_name"
     t.string "presentation"
     t.string "concentration"
-    t.string "medication_route"
+    t.bigint "medication_route_id"
+    t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["generic_name"], name: "index_medications_on_generic_name"
+    t.index ["medication_route_id"], name: "index_medications_on_medication_route_id"
+    t.index ["name"], name: "index_medications_on_name"
   end
 
   create_table "notes", force: :cascade do |t|
@@ -775,16 +821,21 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_01_000004) do
 
   create_table "surgery_categories", force: :cascade do |t|
     t.string "name", null: false
+    t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_surgery_categories_on_name", unique: true
   end
 
   create_table "surgery_procedures", force: :cascade do |t|
     t.string "code"
     t.string "name", null: false
     t.string "category"
+    t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_surgery_procedures_on_category"
+    t.index ["code"], name: "index_surgery_procedures_on_code", unique: true
   end
 
   create_table "surgery_team_members", force: :cascade do |t|
@@ -904,15 +955,40 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_01_000004) do
 
   create_table "vital_signs_ranges", force: :cascade do |t|
     t.string "parameter", null: false
-    t.string "sex"
-    t.integer "age_min"
-    t.integer "age_max"
-    t.decimal "min_normal", precision: 10, scale: 2
-    t.decimal "max_normal", precision: 10, scale: 2
-    t.decimal "min_alert", precision: 10, scale: 2
-    t.decimal "max_alert", precision: 10, scale: 2
+    t.decimal "age_min", precision: 5, scale: 1, default: "0.0"
+    t.decimal "age_max", precision: 5, scale: 1, default: "120.0"
+    t.string "sex", default: "all"
+    t.decimal "min_normal", precision: 8, scale: 2
+    t.decimal "max_normal", precision: 8, scale: 2
+    t.decimal "min_alert", precision: 8, scale: 2
+    t.decimal "max_alert", precision: 8, scale: 2
+    t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["parameter", "age_min", "age_max", "sex"], name: "idx_vsr_param_age_sex", unique: true
+  end
+
+  create_table "webhook_deliveries", force: :cascade do |t|
+    t.bigint "webhook_id", null: false
+    t.string "event", null: false
+    t.jsonb "payload", default: {}
+    t.integer "response_code"
+    t.text "response_body"
+    t.datetime "delivered_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["webhook_id", "created_at"], name: "index_webhook_deliveries_on_webhook_id_and_created_at"
+    t.index ["webhook_id"], name: "index_webhook_deliveries_on_webhook_id"
+  end
+
+  create_table "webhooks", force: :cascade do |t|
+    t.string "url", null: false
+    t.string "event", null: false
+    t.string "secret"
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event", "is_active"], name: "index_webhooks_on_event_and_is_active"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -962,6 +1038,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_01_000004) do
   add_foreign_key "medication_administrations", "hospitalizations"
   add_foreign_key "medication_administrations", "medical_plans"
   add_foreign_key "medication_administrations", "users", column: "administered_by_id"
+  add_foreign_key "medications", "medication_routes"
   add_foreign_key "notes", "emergencies"
   add_foreign_key "notes", "users", column: "created_by_id"
   add_foreign_key "paraclinical_studies", "emergencies"
@@ -987,4 +1064,5 @@ ActiveRecord::Schema[7.0].define(version: 2026_10_01_000004) do
   add_foreign_key "users", "profiles"
   add_foreign_key "vital_signs", "emergencies"
   add_foreign_key "vital_signs", "users", column: "recorded_by_id"
+  add_foreign_key "webhook_deliveries", "webhooks"
 end

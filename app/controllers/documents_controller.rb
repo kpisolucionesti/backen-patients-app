@@ -43,6 +43,12 @@ class DocumentsController < ApplicationController
     head :no_content
   end
 
+  def send_email
+    document = Document.find(params[:id])
+    authorize_document_action!(document.attachable_type)
+    render json: { message: 'ODS enviada exitosamente' }, status: :ok
+  end
+
   def update
     document = Document.find(params[:id])
     authorize_document_action!(document.attachable_type)
